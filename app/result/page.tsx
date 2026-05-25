@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RotateCcw, Trophy } from "lucide-react";
-import { TopBar } from "@/components/TopBar";
 import { useGameStore } from "@/features/game/game-store";
 import { formatDuration } from "@/features/game/scoring";
 import type { FinalSummary } from "@/features/game/types";
@@ -118,14 +117,6 @@ export default function ResultPage() {
   return (
     <main className="shell">
       <div className="noise" />
-      <TopBar
-        right={
-          <div className="hud-pill">
-            <Trophy size={17} aria-hidden="true" />
-            {rankLabel}
-          </div>
-        }
-      />
       <section className="result-page">
         <div className="result-grid">
           <div className="result-card">

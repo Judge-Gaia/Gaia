@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Clock, Flag, RotateCcw, ShieldCheck } from "lucide-react";
 import { AchievementPanel } from "@/components/achievements/AchievementPanel";
-import { TopBar } from "@/components/TopBar";
 import { TARGET_EVENT_COUNT } from "@/features/game/game-data";
 import { useGameStore } from "@/features/game/game-store";
 import { formatDuration } from "@/features/game/scoring";
 
-const EarthScene = dynamic(() => import("@/components/earth/EarthScene").then((mod) => mod.EarthScene), {
+const EarthSceneSafe = dynamic(() => import("@/components/earth/EarthSceneSafe").then((mod) => mod.EarthSceneSafe), {
   ssr: false
 });
 
@@ -50,17 +49,9 @@ export default function GamePage() {
   return (
     <main className="shell">
       <div className="noise" />
-      <TopBar
-        right={
-          <div className="hud-pill">
-            <ShieldCheck size={17} aria-hidden="true" />
-            {playerName}
-          </div>
-        }
-      />
       <section className="game-layout">
         <div className="earth-stage">
-          <EarthScene events={activeEvents} />
+          <EarthSceneSafe events={activeEvents} />
           <div className="floating-hud" aria-label="게임 상태">
             <div className="hud-pill">
               <Flag size={17} aria-hidden="true" />

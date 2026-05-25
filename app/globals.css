@@ -278,6 +278,29 @@ a {
   width: 100%;
 }
 
+.earth-fallback {
+  background:
+    radial-gradient(circle at 52% 48%, rgba(78, 188, 255, 0.2) 0 12%, rgba(0, 0, 0, 0) 35%),
+    radial-gradient(circle at 18% 20%, rgba(86, 217, 255, 0.15), rgba(1, 3, 11, 0) 46%),
+    radial-gradient(circle at 80% 82%, rgba(159, 123, 255, 0.12), rgba(1, 3, 11, 0) 44%),
+    #01030b;
+  overflow: hidden;
+}
+
+.earth-fallback-glow {
+  background: radial-gradient(circle, rgba(74, 202, 255, 0.24), rgba(74, 202, 255, 0) 64%);
+  border-radius: 999px;
+  filter: blur(2px);
+  height: min(48vw, 420px);
+  left: 50%;
+  opacity: 0.8;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(48vw, 420px);
+}
+
 .space-backdrop {
   inset: 0;
   position: fixed;
@@ -386,7 +409,13 @@ a {
   position: relative;
 }
 
+.event-stage.entry-zooming .event-scene {
+  animation: event-entry-zoom 980ms cubic-bezier(0.16, 0.78, 0.22, 1);
+  transform-origin: center;
+}
+
 .event-scene {
+  background: radial-gradient(circle at 50% -20%, rgba(120, 202, 255, 0.16), transparent 58%), #04090f;
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow:
@@ -396,9 +425,41 @@ a {
   position: relative;
 }
 
+.entry-zoom-overlay {
+  background:
+    radial-gradient(circle at center, transparent 0 14%, rgba(0, 0, 0, 0.36) 24%, rgba(0, 0, 0, 0.8) 52%, #01030a 100%),
+    radial-gradient(circle at center, rgba(100, 220, 255, 0.28), transparent 35%);
+  inset: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  position: absolute;
+  z-index: 14;
+  animation: zoom-overlay-fade 980ms ease-out forwards;
+}
+
 .scene-sky {
   inset: 0;
   position: absolute;
+}
+
+.scene-atmosphere {
+  background: radial-gradient(circle at 55% 30%, rgba(176, 230, 255, 0.16), transparent 46%);
+  inset: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.scene-weather {
+  animation: drift 18s linear infinite;
+  background:
+    radial-gradient(circle at 16% 42%, rgba(255, 255, 255, 0.14), transparent 18%),
+    radial-gradient(circle at 74% 30%, rgba(255, 255, 255, 0.1), transparent 22%),
+    radial-gradient(circle at 48% 62%, rgba(255, 255, 255, 0.08), transparent 25%);
+  inset: 0;
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  position: absolute;
+  z-index: 2;
 }
 
 .scene-ground {
@@ -407,6 +468,35 @@ a {
   left: 0;
   position: absolute;
   right: 0;
+  z-index: 2;
+}
+
+.scene-depth {
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.48), transparent 42%),
+    radial-gradient(circle at 50% 120%, rgba(0, 0, 0, 0.62), transparent 58%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 4;
+}
+
+.scene-vignette {
+  box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.55);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 9;
+}
+
+.scene-scanlines {
+  background: repeating-linear-gradient(to bottom, rgba(150, 236, 255, 0.08) 0 1px, transparent 1px 3px);
+  inset: 0;
+  mix-blend-mode: soft-light;
+  opacity: 0.24;
+  pointer-events: none;
+  position: absolute;
+  z-index: 10;
 }
 
 .event-info {
@@ -434,6 +524,78 @@ a {
   color: #c9d9e6;
   line-height: 1.6;
   margin: 0;
+}
+
+.mission-brief {
+  background: linear-gradient(180deg, rgba(8, 26, 44, 0.72), rgba(6, 16, 31, 0.78));
+  border: 1px solid rgba(126, 213, 255, 0.22);
+  border-radius: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+}
+
+.mission-brief h3 {
+  align-items: center;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+
+.mission-brief ul {
+  color: #c6d8e8;
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 16px;
+}
+
+.mission-brief li {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.event-meta-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.event-meta-card {
+  background: linear-gradient(180deg, rgba(19, 44, 73, 0.52), rgba(7, 17, 35, 0.68));
+  border: 1px solid rgba(126, 213, 255, 0.24);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+}
+
+.event-meta-card span {
+  align-items: center;
+  color: #aed1e7;
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.event-meta-card strong {
+  font-size: 18px;
+}
+
+.threat-meter {
+  background: rgba(13, 29, 48, 0.9);
+  border: 1px solid rgba(126, 213, 255, 0.22);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.threat-meter i {
+  background: linear-gradient(90deg, #ffd85f, #ff9345 54%, #ff4f5d);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
 }
 
 .skill-bar {
@@ -644,14 +806,108 @@ a {
   z-index: 3;
 }
 
+.scene-hud {
+  backdrop-filter: blur(7px);
+  background: rgba(4, 14, 25, 0.46);
+  border: 1px solid rgba(126, 213, 255, 0.22);
+  border-radius: 999px;
+  color: #bde5f4;
+  display: flex;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 12px;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  position: absolute;
+  text-transform: uppercase;
+  z-index: 11;
+}
+
+.scene-hud-top {
+  left: 16px;
+  top: 14px;
+}
+
+.scene-hud-bottom {
+  bottom: 14px;
+  right: 16px;
+}
+
 .fire {
   animation: flicker 760ms infinite alternate;
   background: radial-gradient(circle at 50% 75%, #ffe16d 0 16%, #ff7a24 17% 46%, #aa1c15 47% 68%, transparent 70%);
   bottom: 24%;
   height: 280px;
   left: 48%;
+  opacity: var(--fire-intensity, 1);
   transform: translateX(-50%);
   width: 360px;
+}
+
+.fire.suppressed {
+  filter: saturate(0.8);
+}
+
+.mountain-range {
+  background:
+    linear-gradient(130deg, transparent 0 28%, #130d08 29% 54%, transparent 55%) 2% 100% / 280px 210px no-repeat,
+    linear-gradient(60deg, transparent 0 28%, #1d110a 29% 56%, transparent 57%) 22% 100% / 330px 240px no-repeat,
+    linear-gradient(116deg, transparent 0 28%, #180f09 29% 58%, transparent 59%) 58% 100% / 370px 250px no-repeat,
+    linear-gradient(72deg, transparent 0 28%, #140d08 29% 54%, transparent 55%) 84% 100% / 310px 220px no-repeat;
+  bottom: 20%;
+  height: 56%;
+  left: -6%;
+  opacity: 0.86;
+  width: 112%;
+  z-index: 3;
+}
+
+.mountain-range-far {
+  bottom: 30%;
+  filter: blur(2px);
+  opacity: 0.52;
+  transform: scale(1.06);
+  z-index: 2;
+}
+
+.scene-rain {
+  animation: rain-fall 360ms linear infinite;
+  background:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0 13px,
+      rgba(143, 230, 255, 0.8) 13px 15px,
+      transparent 15px 22px
+    );
+  inset: -20% -8% -12%;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+  z-index: 6;
+}
+
+.scene-status {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 5;
+}
+
+.scene-status.status-yellow {
+  box-shadow: inset 0 -120px 160px rgba(255, 214, 108, 0.12);
+}
+
+.scene-status.status-orange {
+  box-shadow: inset 0 -130px 180px rgba(255, 143, 59, 0.16);
+}
+
+.scene-status.status-red {
+  box-shadow: inset 0 -140px 200px rgba(255, 76, 60, 0.22);
+}
+
+.scene-status.status-black {
+  box-shadow: inset 0 0 210px rgba(9, 11, 14, 0.72);
 }
 
 .trash {
@@ -667,12 +923,25 @@ a {
   width: 420px;
 }
 
+.trash.clearing {
+  filter: saturate(calc(1 - (var(--cleanup-progress, 0) * 0.35)));
+  opacity: calc(1 - (var(--cleanup-progress, 0) * 0.9));
+  transform: translateX(calc(var(--cleanup-progress, 0) * 140px)) translateY(calc(var(--cleanup-progress, 0) * -40px)) rotate(-7deg);
+}
+
 .oil {
   background: radial-gradient(ellipse at center, rgba(2, 3, 3, 0.88), rgba(7, 12, 11, 0.62) 56%, transparent 70%);
   bottom: 20%;
   height: 230px;
   left: 28%;
   width: 560px;
+}
+
+.oil.clearing {
+  filter: blur(calc(var(--cleanup-progress, 0) * 2.6px));
+  opacity: calc(1 - (var(--cleanup-progress, 0) * 0.94));
+  transform: scale(calc(1 - (var(--cleanup-progress, 0) * 0.18)));
+  transform-origin: center 70%;
 }
 
 .stumps {
@@ -686,12 +955,40 @@ a {
   width: 74%;
 }
 
+.regrowth {
+  background:
+    radial-gradient(ellipse at center, rgba(105, 209, 121, 0.9) 0 35%, transparent 36%) 14% 79% / 96px 70px no-repeat,
+    radial-gradient(ellipse at center, rgba(88, 190, 104, 0.92) 0 35%, transparent 36%) 46% 66% / 124px 84px no-repeat,
+    radial-gradient(ellipse at center, rgba(84, 180, 97, 0.9) 0 35%, transparent 36%) 76% 79% / 100px 72px no-repeat;
+  bottom: 14%;
+  filter: blur(1px);
+  height: 260px;
+  left: 12%;
+  opacity: 0;
+  transform: scale(0.88);
+  transform-origin: center bottom;
+  transition: opacity 220ms linear;
+  width: 74%;
+  z-index: 3;
+}
+
+.regrowth.active {
+  opacity: calc(var(--cleanup-progress, 0) * 0.92);
+  transform: scale(calc(0.88 + (var(--cleanup-progress, 0) * 0.16)));
+}
+
 .smog {
   background:
     radial-gradient(circle, rgba(60, 64, 62, 0.8), transparent 62%) 12% 28% / 300px 170px no-repeat,
     radial-gradient(circle, rgba(94, 98, 91, 0.75), transparent 62%) 47% 18% / 430px 210px no-repeat,
     radial-gradient(circle, rgba(50, 54, 52, 0.8), transparent 62%) 78% 34% / 360px 190px no-repeat;
   inset: 0;
+}
+
+.smog.clearing {
+  filter: blur(calc(var(--cleanup-progress, 0) * 3px));
+  opacity: calc(1 - (var(--cleanup-progress, 0) * 0.92));
+  transform: translateX(calc(var(--cleanup-progress, 0) * 86px));
 }
 
 .cracks {
@@ -702,6 +999,11 @@ a {
   inset: 0;
 }
 
+.cracks.wetting {
+  filter: saturate(calc(1 - (var(--cleanup-progress, 0) * 0.5)));
+  opacity: calc(1 - (var(--cleanup-progress, 0) * 0.76));
+}
+
 @keyframes flicker {
   from {
     filter: brightness(0.9);
@@ -710,6 +1012,46 @@ a {
   to {
     filter: brightness(1.25);
     transform: translateX(-50%) scale(1.04);
+  }
+}
+
+@keyframes event-entry-zoom {
+  from {
+    filter: blur(6px) brightness(1.35);
+    opacity: 0.1;
+    transform: scale(1.55);
+  }
+  to {
+    filter: blur(0) brightness(1);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-overlay-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rain-fall {
+  from {
+    transform: translateY(-18px) translateX(6px);
+  }
+  to {
+    transform: translateY(18px) translateX(-6px);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-2%);
+  }
+  to {
+    transform: translateX(2%);
   }
 }
 
@@ -727,6 +1069,10 @@ a {
 
   .skill-bar {
     grid-template-columns: repeat(2, minmax(0, 140px));
+  }
+
+  .event-meta-grid {
+    grid-template-columns: 1fr;
   }
 
   .stat-grid {

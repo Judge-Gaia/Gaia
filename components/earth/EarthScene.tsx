@@ -84,6 +84,19 @@ function EarthMesh({ events }: { events: ActiveEvent[] }) {
 
   const handlePointClick = (event: ThreeEvent<MouseEvent>, instanceId: string) => {
     event.stopPropagation();
+    const point = events.find((item) => item.instanceId === instanceId);
+    if (point && typeof window !== "undefined") {
+      window.sessionStorage.setItem(
+        "gaia-zoom-entry",
+        JSON.stringify({
+          instanceId,
+          eventId: point.eventId,
+          latitude: point.latitude,
+          longitude: point.longitude,
+          at: Date.now()
+        })
+      );
+    }
     router.push(`/event/${encodeURIComponent(instanceId)}`);
   };
 
@@ -164,4 +177,3 @@ export function EarthScene({ events }: { events: ActiveEvent[] }) {
     </div>
   );
 }
-

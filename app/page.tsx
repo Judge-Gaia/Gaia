@@ -4,10 +4,9 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Play } from "lucide-react";
-import { TopBar } from "@/components/TopBar";
 import { useGameStore } from "@/features/game/game-store";
 
-const EarthScene = dynamic(() => import("@/components/earth/EarthScene").then((mod) => mod.EarthScene), {
+const EarthSceneSafe = dynamic(() => import("@/components/earth/EarthSceneSafe").then((mod) => mod.EarthSceneSafe), {
   ssr: false
 });
 
@@ -28,9 +27,8 @@ export default function HomePage() {
     <main className="shell">
       <div className="noise" />
       <div className="space-backdrop" aria-hidden="true">
-        <EarthScene events={[]} />
+        <EarthSceneSafe events={[]} />
       </div>
-      <TopBar />
       <section className="intro">
         <div className="intro-grid">
           <div>
