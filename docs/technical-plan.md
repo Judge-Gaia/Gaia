@@ -63,6 +63,7 @@ type EventDefinition = {
   id: string;
   title: string;
   description: string;
+  sceneImage: string;
   requiredSkillIds: SkillId[];
   education: {
     resolvedMessage: string;
@@ -100,10 +101,10 @@ type ActiveEvent = {
    - 회전 지구 렌더링
    - 이벤트 포인트 표시
    - 업적 패널 표시
-   - 이벤트 클릭 시 `/event/[eventId]?instanceId=...`로 이동
+   - 이벤트 클릭 시 포인트의 화면 좌표에서 현장 이미지가 확대된 뒤 `/event/[instanceId]`로 이동
 
-3. `/event/[eventId]`
-   - 이벤트 상황 렌더링
+3. `/event/[instanceId]`
+   - 이벤트별 사실적 현장 이미지와 상태 오버레이 렌더링
    - 스킬 선택 UI 표시
    - 정답 스킬이면 결과 모달 표시
    - 확인 시 `/game`으로 복귀
@@ -189,4 +190,3 @@ type ActiveEvent = {
 8. 점수 계산과 종료 화면 구현
 9. Supabase 랭킹 테이블 및 API 구현
 10. Playwright로 주요 흐름 검증
-

@@ -39,6 +39,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "산불",
     description: "건조한 숲에서 산불이 번지고 있습니다. 불길이 검정 단계에 닿기 전에 진압해야 합니다.",
     sceneClass: "wildfire",
+    sceneImage: "/events/wildfire.jpg",
     requiredSkillIds: ["rain"],
     education: {
       resolvedMessage: "비를 내려 산불 확산을 막았습니다.",
@@ -55,6 +56,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "해양 쓰레기",
     description: "플라스틱과 폐기물이 해류를 따라 퍼지고 있습니다. 해양 생물이 다치기 전에 수거 지점으로 밀어내야 합니다.",
     sceneClass: "ocean_trash",
+    sceneImage: "/events/ocean-trash.jpg",
     requiredSkillIds: ["wind"],
     education: {
       resolvedMessage: "바람으로 쓰레기를 해안 수거 지점까지 이동시켰습니다.",
@@ -71,6 +73,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "기름 유출",
     description: "기름막이 바다 표면을 덮고 있습니다. 오염이 해안으로 번지기 전에 정화해야 합니다.",
     sceneClass: "oil_spill",
+    sceneImage: "/events/oil-spill.jpg",
     requiredSkillIds: ["purify"],
     education: {
       resolvedMessage: "정화 스킬로 기름막을 분해했습니다.",
@@ -87,6 +90,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "불법 벌목",
     description: "숲이 빠르게 사라지고 있습니다. 남은 생태축이 끊기기 전에 식생을 회복해야 합니다.",
     sceneClass: "illegal_logging",
+    sceneImage: "/events/illegal-logging.jpg",
     requiredSkillIds: ["grow"],
     education: {
       resolvedMessage: "성장 스킬로 훼손된 숲의 회복을 시작했습니다.",
@@ -103,6 +107,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "대기 오염",
     description: "스모그가 도시를 덮고 있습니다. 오염 공기가 정체되기 전에 흐름을 만들어야 합니다.",
     sceneClass: "air_pollution",
+    sceneImage: "/events/air-pollution.jpg",
     requiredSkillIds: ["wind"],
     education: {
       resolvedMessage: "바람길을 만들어 오염 공기의 정체를 해소했습니다.",
@@ -119,6 +124,7 @@ export const eventDefinitions: EventDefinition[] = [
     shortTitle: "가뭄",
     description: "땅이 말라 식물이 버티지 못하고 있습니다. 물 순환을 회복해야 합니다.",
     sceneClass: "drought",
+    sceneImage: "/events/drought.jpg",
     requiredSkillIds: ["rain"],
     education: {
       resolvedMessage: "비를 내려 마른 토양을 적셨습니다.",

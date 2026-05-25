@@ -4,6 +4,8 @@ import { Component, type ReactNode } from "react";
 import { EarthScene } from "@/components/earth/EarthScene";
 import type { ActiveEvent } from "@/features/game/types";
 
+type EventSelectionHandler = (event: ActiveEvent, anchor: { x: number; y: number }) => void;
+
 class EarthSceneErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
   { hasError: boolean }
@@ -37,11 +39,16 @@ function EarthFallback() {
   );
 }
 
-export function EarthSceneSafe({ events }: { events: ActiveEvent[] }) {
+export function EarthSceneSafe({
+  events,
+  onSelectEvent
+}: {
+  events: ActiveEvent[];
+  onSelectEvent?: EventSelectionHandler;
+}) {
   return (
     <EarthSceneErrorBoundary fallback={<EarthFallback />}>
-      <EarthScene events={events} />
+      <EarthScene events={events} onSelectEvent={onSelectEvent} />
     </EarthSceneErrorBoundary>
   );
 }
-

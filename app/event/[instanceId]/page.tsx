@@ -40,7 +40,6 @@ export default function EventPage() {
   const params = useParams<{ instanceId: string }>();
   const router = useRouter();
   const [feedback, setFeedback] = useState("");
-  const [isEntryZooming, setIsEntryZooming] = useState(true);
   const [isResolvingSkill, setIsResolvingSkill] = useState(false);
   const [sceneSkillEffect, setSceneSkillEffect] = useState<SkillId | null>(null);
   const [suppressionProgress, setSuppressionProgress] = useState(0);
@@ -102,15 +101,6 @@ export default function EventPage() {
     }
   }, [activeEvent]);
 
-  useEffect(() => {
-    const raw = typeof window !== "undefined" ? window.sessionStorage.getItem("gaia-zoom-entry") : null;
-    if (raw) {
-      window.sessionStorage.removeItem("gaia-zoom-entry");
-    }
-    const timer = window.setTimeout(() => setIsEntryZooming(false), 980);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   const elapsed = startedAt ? Math.max(0, Math.round((Date.now() - startedAt) / 1000)) : 0;
 
   const handleUseSkill = (skillId: SkillId) => {
@@ -171,14 +161,13 @@ export default function EventPage() {
     <main className="shell">
       <div className="noise" />
       <section className="event-layout">
-        <div className={`event-stage ${isEntryZooming ? "entry-zooming" : ""}`}>
+        <div className="event-stage">
           <EventScene
             eventId={definition.id}
             status={displayEvent.status}
             activeSkill={sceneSkillEffect}
             suppressionProgress={suppressionProgress}
           />
-          {isEntryZooming && <div className="entry-zoom-overlay" aria-hidden="true" />}
           <div className="event-info">
             <DangerBadge status={displayEvent.status} />
             <h1>{definition.title}</h1>

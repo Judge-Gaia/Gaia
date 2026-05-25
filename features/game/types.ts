@@ -8,6 +8,7 @@ export type EventDefinition = {
   shortTitle: string;
   description: string;
   sceneClass: string;
+  sceneImage: string;
   requiredSkillIds: SkillId[];
   education: {
     resolvedMessage: string;

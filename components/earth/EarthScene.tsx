@@ -2,7 +2,6 @@
 
 import { OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
-import { useRouter } from "next/navigation";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ActiveEvent, DangerStatus } from "@/features/game/types";
@@ -57,10 +56,17 @@ function StarField() {
   );
 }
 
-function EarthMesh({ events }: { events: ActiveEvent[] }) {
+type EventSelectionHandler = (event: ActiveEvent, anchor: { x: number; y: number }) => void;
+
+function EarthMesh({
+  events,
+  onSelectEvent
+}: {
+  events: ActiveEvent[];
+  onSelectEvent?: EventSelectionHandler;
+}) {
   const earthRef = useRef<THREE.Group>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
-  const router = useRouter();
   const [earthMap, specularMap, normalMap, cloudMap] = useTexture([
     "/textures/earth_atmos_2048.jpg",
     "/textures/earth_specular_2048.jpg",
@@ -85,19 +91,9 @@ function EarthMesh({ events }: { events: ActiveEvent[] }) {
   const handlePointClick = (event: ThreeEvent<MouseEvent>, instanceId: string) => {
     event.stopPropagation();
     const point = events.find((item) => item.instanceId === instanceId);
-    if (point && typeof window !== "undefined") {
-      window.sessionStorage.setItem(
-        "gaia-zoom-entry",
-        JSON.stringify({
-          instanceId,
-          eventId: point.eventId,
-          latitude: point.latitude,
-          longitude: point.longitude,
-          at: Date.now()
-        })
-      );
+    if (point) {
+      onSelectEvent?.(point, { x: event.clientX, y: event.clientY });
     }
-    router.push(`/event/${encodeURIComponent(instanceId)}`);
   };
 
   return (
@@ -149,7 +145,13 @@ function EarthMesh({ events }: { events: ActiveEvent[] }) {
   );
 }
 
-export function EarthScene({ events }: { events: ActiveEvent[] }) {
+export function EarthScene({
+  events,
+  onSelectEvent
+}: {
+  events: ActiveEvent[];
+  onSelectEvent?: EventSelectionHandler;
+}) {
   return (
     <div className="earth-canvas">
       <Canvas camera={{ position: [0, 0.14, 6.15], fov: 41 }} gl={{ antialias: true }} shadows>
@@ -160,7 +162,7 @@ export function EarthScene({ events }: { events: ActiveEvent[] }) {
         <directionalLight position={[5, 2.7, 4]} intensity={3.8} castShadow color="#fff8ee" />
         <pointLight position={[-5, 1.6, 3.4]} color="#2f8cff" intensity={4.6} />
         <pointLight position={[3, -4, -6]} color="#4fffd2" intensity={1.35} />
-        <EarthMesh events={events} />
+        <EarthMesh events={events} onSelectEvent={onSelectEvent} />
         <OrbitControls
           autoRotate
           autoRotateSpeed={0.16}
