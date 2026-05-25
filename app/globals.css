@@ -27,9 +27,7 @@ body {
 }
 
 body {
-  background:
-    linear-gradient(180deg, rgba(7, 17, 37, 0.92) 0%, rgba(1, 4, 13, 0.98) 42%, #01030a 100%),
-    #01040d;
+  background: #01030b;
   color: var(--text);
   font-family:
     Arial,
@@ -78,7 +76,7 @@ a {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.22;
+  opacity: 0.12;
   background-image:
     linear-gradient(rgba(86, 217, 255, 0.055) 1px, transparent 1px),
     linear-gradient(90deg, rgba(86, 217, 255, 0.055) 1px, transparent 1px);
@@ -135,7 +133,7 @@ a {
 .hud-pill {
   align-items: center;
   backdrop-filter: blur(18px);
-  background: linear-gradient(180deg, rgba(9, 23, 52, 0.74), rgba(3, 9, 21, 0.78));
+  background: linear-gradient(180deg, rgba(9, 23, 52, 0.44), rgba(3, 9, 21, 0.58));
   border: 1px solid var(--line);
   border-radius: 999px;
   box-shadow:
@@ -200,16 +198,22 @@ a {
   display: grid;
   min-height: 100vh;
   padding: 96px clamp(18px, 5vw, 72px) 34px;
+  pointer-events: none;
+  position: relative;
+  z-index: 5;
 }
 
 .intro-grid {
   align-items: center;
   display: grid;
-  gap: clamp(28px, 5vw, 76px);
-  grid-template-columns: minmax(280px, 0.78fr) minmax(360px, 1.22fr);
+  grid-template-columns: minmax(280px, 620px);
   margin: 0 auto;
   max-width: 1180px;
   width: 100%;
+}
+
+.intro-grid > div {
+  pointer-events: auto;
 }
 
 .intro h1 {
@@ -239,7 +243,7 @@ a {
 
 .start-form input {
   backdrop-filter: blur(18px);
-  background: rgba(5, 14, 32, 0.78);
+  background: rgba(5, 14, 32, 0.5);
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--text);
@@ -254,42 +258,30 @@ a {
   border-color: rgba(114, 215, 255, 0.8);
 }
 
-.intro-visual {
-  aspect-ratio: 1;
-  min-height: 360px;
-  position: relative;
-}
-
-.intro-visual .earth-canvas {
-  min-height: 420px;
-}
-
 .game-layout {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  display: block;
   min-height: 100vh;
-  padding: 94px clamp(16px, 3vw, 34px) 24px;
+  padding: 0;
 }
 
 .earth-stage {
-  background:
-    linear-gradient(180deg, rgba(86, 217, 255, 0.06), transparent 28%),
-    rgba(1, 4, 13, 0.2);
-  border: 1px solid rgba(126, 213, 255, 0.14);
-  border-radius: 8px;
-  box-shadow:
-    inset 0 0 80px rgba(42, 158, 255, 0.08),
-    0 0 90px rgba(0, 0, 0, 0.42);
-  min-height: calc(100vh - 118px);
-  position: relative;
+  inset: 0;
+  min-height: 100vh;
+  position: fixed;
+  z-index: 1;
 }
 
 .earth-canvas {
   height: 100%;
-  min-height: 540px;
+  min-height: 100vh;
   position: relative;
   width: 100%;
+}
+
+.space-backdrop {
+  inset: 0;
+  position: fixed;
+  z-index: 1;
 }
 
 .earth-canvas canvas {
@@ -306,7 +298,7 @@ a {
   flex-wrap: wrap;
   gap: 10px;
   left: 50%;
-  position: absolute;
+  position: fixed;
   transform: translateX(-50%);
   z-index: 10;
 }
@@ -321,6 +313,14 @@ a {
   max-height: calc(100vh - 118px);
   overflow: auto;
   padding: 16px;
+}
+
+.game-layout > .side-panel {
+  position: fixed;
+  right: clamp(16px, 3vw, 34px);
+  top: 96px;
+  width: min(300px, calc(100vw - 32px));
+  z-index: 12;
 }
 
 .side-panel::before,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { RotateCcw, Trophy } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { useGameStore } from "@/features/game/game-store";
@@ -47,14 +47,16 @@ function writeLocalRanking(summary: FinalSummary) {
 export default function ResultPage() {
   const router = useRouter();
   const { finalSummary, finishGame, resetGame } = useGameStore();
+  const [summary, setSummary] = useState<FinalSummary | null>(null);
   const [rankings, setRankings] = useState<RankingItem[]>([]);
   const [rankLabel, setRankLabel] = useState("저장 중");
 
-  const summary = useMemo(() => finalSummary ?? finishGame(), [finalSummary, finishGame]);
+  useEffect(() => {
+    setSummary(finalSummary ?? finishGame());
+  }, [finalSummary, finishGame]);
 
   useEffect(() => {
     if (!summary) {
-      router.replace("/");
       return;
     }
 
@@ -186,4 +188,3 @@ export default function ResultPage() {
     </main>
   );
 }
-

@@ -27,6 +27,9 @@ export default function HomePage() {
   return (
     <main className="shell">
       <div className="noise" />
+      <div className="space-backdrop" aria-hidden="true">
+        <EarthScene events={[]} />
+      </div>
       <TopBar />
       <section className="intro">
         <div className="intro-grid">
@@ -50,12 +53,8 @@ export default function HomePage() {
               </button>
             </form>
           </div>
-          <div className="intro-visual" aria-hidden="true">
-            <EarthScene events={[]} />
-          </div>
         </div>
       </section>
     </main>
   );
 }
-
