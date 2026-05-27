@@ -12,11 +12,13 @@ const icons = {
 };
 
 export function SkillDeck({
+  activeSkill,
   disabled,
-  onUse
+  onSelect
 }: {
+  activeSkill?: SkillId | null;
   disabled?: boolean;
-  onUse: (skillId: SkillId) => void;
+  onSelect: (skillId: SkillId) => void;
 }) {
   return (
     <div className="skill-bar" aria-label="스킬">
@@ -24,10 +26,11 @@ export function SkillDeck({
         const Icon = icons[skill.id];
         return (
           <button
-            className="skill-button"
+            aria-pressed={activeSkill === skill.id}
+            className={`skill-button ${activeSkill === skill.id ? "selected" : ""}`}
             disabled={disabled}
             key={skill.id}
-            onClick={() => onUse(skill.id)}
+            onClick={() => onSelect(skill.id)}
             title={skill.description}
           >
             <Icon size={28} aria-hidden="true" />
@@ -38,4 +41,3 @@ export function SkillDeck({
     </div>
   );
 }
-

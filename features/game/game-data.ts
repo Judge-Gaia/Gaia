@@ -12,23 +12,23 @@ export const STATUS_TIMINGS = {
 export const skills: SkillDefinition[] = [
   {
     id: "rain",
-    name: "비",
-    description: "물을 내려 산불과 가뭄을 진정시킵니다."
+    name: "물뿌리개",
+    description: "현장을 누른 채 움직여 물을 분사합니다."
   },
   {
     id: "wind",
-    name: "바람",
-    description: "흐름을 만들어 쓰레기와 오염 공기를 밀어냅니다."
+    name: "염력 바람",
+    description: "현장을 드래그해 오염물과 정체된 공기를 밀어냅니다."
   },
   {
     id: "purify",
-    name: "정화",
-    description: "독성 물질과 기름 오염을 분해합니다."
+    name: "정화 흡착기",
+    description: "오염 구간을 훑어 독성 물질과 기름을 흡수합니다."
   },
   {
     id: "grow",
-    name: "성장",
-    description: "훼손된 숲과 식생을 회복시킵니다."
+    name: "생장 씨앗",
+    description: "황폐한 구역에 복원 에너지를 직접 심습니다."
   }
 ];
 
@@ -40,6 +40,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "건조한 숲에서 산불이 번지고 있습니다. 불길이 검정 단계에 닿기 전에 진압해야 합니다.",
     sceneClass: "wildfire",
     sceneImage: "/events/wildfire.jpg",
+    resolvedSceneImage: "/events/wildfire-resolved.jpg",
+    interaction: {
+      toolLabel: "물뿌리개 장착",
+      instruction: "불길 위를 누른 채 움직여 충분히 물을 분사하세요.",
+      progressLabel: "진압 수분량"
+    },
     requiredSkillIds: ["rain"],
     education: {
       resolvedMessage: "비를 내려 산불 확산을 막았습니다.",
@@ -57,6 +63,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "플라스틱과 폐기물이 해류를 따라 퍼지고 있습니다. 해양 생물이 다치기 전에 수거 지점으로 밀어내야 합니다.",
     sceneClass: "ocean_trash",
     sceneImage: "/events/ocean-trash.jpg",
+    resolvedSceneImage: "/events/ocean-trash-resolved.jpg",
+    interaction: {
+      toolLabel: "염력 수거장 장착",
+      instruction: "물 위를 누른 채 훑어 쓰레기를 수거 흐름으로 끌어오세요.",
+      progressLabel: "수거 범위"
+    },
     requiredSkillIds: ["wind"],
     education: {
       resolvedMessage: "바람으로 쓰레기를 해안 수거 지점까지 이동시켰습니다.",
@@ -74,6 +86,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "기름막이 바다 표면을 덮고 있습니다. 오염이 해안으로 번지기 전에 정화해야 합니다.",
     sceneClass: "oil_spill",
     sceneImage: "/events/oil-spill.jpg",
+    resolvedSceneImage: "/events/oil-spill-resolved.jpg",
+    interaction: {
+      toolLabel: "정화 흡착기 장착",
+      instruction: "검은 기름막 위를 누른 채 움직여 흡착 처리하세요.",
+      progressLabel: "정화 처리량"
+    },
     requiredSkillIds: ["purify"],
     education: {
       resolvedMessage: "정화 스킬로 기름막을 분해했습니다.",
@@ -91,6 +109,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "숲이 빠르게 사라지고 있습니다. 남은 생태축이 끊기기 전에 식생을 회복해야 합니다.",
     sceneClass: "illegal_logging",
     sceneImage: "/events/illegal-logging.jpg",
+    resolvedSceneImage: "/events/illegal-logging-resolved.jpg",
+    interaction: {
+      toolLabel: "생장 씨앗 장착",
+      instruction: "벌목된 땅을 누른 채 지나가며 복원 씨앗을 심으세요.",
+      progressLabel: "복원 식재율"
+    },
     requiredSkillIds: ["grow"],
     education: {
       resolvedMessage: "성장 스킬로 훼손된 숲의 회복을 시작했습니다.",
@@ -108,6 +132,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "스모그가 도시를 덮고 있습니다. 오염 공기가 정체되기 전에 흐름을 만들어야 합니다.",
     sceneClass: "air_pollution",
     sceneImage: "/events/air-pollution.jpg",
+    resolvedSceneImage: "/events/air-pollution-resolved.jpg",
+    interaction: {
+      toolLabel: "염력 바람 장착",
+      instruction: "도시 상공을 누른 채 휩쓸어 스모그를 밀어내세요.",
+      progressLabel: "가시거리 회복"
+    },
     requiredSkillIds: ["wind"],
     education: {
       resolvedMessage: "바람길을 만들어 오염 공기의 정체를 해소했습니다.",
@@ -125,6 +155,12 @@ export const eventDefinitions: EventDefinition[] = [
     description: "땅이 말라 식물이 버티지 못하고 있습니다. 물 순환을 회복해야 합니다.",
     sceneClass: "drought",
     sceneImage: "/events/drought.jpg",
+    resolvedSceneImage: "/events/drought-resolved.jpg",
+    interaction: {
+      toolLabel: "물뿌리개 장착",
+      instruction: "갈라진 토양을 누른 채 이동하며 고르게 적셔 주세요.",
+      progressLabel: "토양 수분 회복"
+    },
     requiredSkillIds: ["rain"],
     education: {
       resolvedMessage: "비를 내려 마른 토양을 적셨습니다.",
@@ -152,4 +188,3 @@ export const eventLocations = [
   { latitude: 35.7, longitude: 139.7 },
   { latitude: 19.4, longitude: -99.1 }
 ];
-

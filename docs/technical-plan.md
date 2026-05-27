@@ -64,6 +64,12 @@ type EventDefinition = {
   title: string;
   description: string;
   sceneImage: string;
+  resolvedSceneImage: string;
+  interaction: {
+    toolLabel: string;
+    instruction: string;
+    progressLabel: string;
+  };
   requiredSkillIds: SkillId[];
   education: {
     resolvedMessage: string;
@@ -105,8 +111,8 @@ type ActiveEvent = {
 
 3. `/event/[instanceId]`
    - 이벤트별 사실적 현장 이미지와 상태 오버레이 렌더링
-   - 스킬 선택 UI 표시
-   - 정답 스킬이면 결과 모달 표시
+   - 도구 선택 후 포인터 기반 직접 작업 UI와 진행률 표시
+   - 작업 완료율이 100%가 되면 복구 이미지로 전환하고 결과 모달 표시
    - 확인 시 `/game`으로 복귀
 
 4. `/result`

@@ -9,6 +9,12 @@ export type EventDefinition = {
   description: string;
   sceneClass: string;
   sceneImage: string;
+  resolvedSceneImage: string;
+  interaction: {
+    toolLabel: string;
+    instruction: string;
+    progressLabel: string;
+  };
   requiredSkillIds: SkillId[];
   education: {
     resolvedMessage: string;
@@ -61,4 +67,3 @@ export type FinalSummary = {
   failedCount: number;
   achievements: Achievement[];
 };
-
