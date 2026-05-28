@@ -19,7 +19,7 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/textures/earth_normal_2048.jpg" />
         <link rel="preload" as="image" href="/textures/earth_specular_2048.jpg" />
       </head>
-      <body>{children}</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
