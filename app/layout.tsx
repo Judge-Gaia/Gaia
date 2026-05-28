@@ -13,8 +13,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preload" as="image" href="/textures/earth_atmos_2048.jpg" />
+        <link rel="preload" as="image" href="/textures/earth_clouds_1024.png" />
+        <link rel="preload" as="image" href="/textures/earth_normal_2048.jpg" />
+        <link rel="preload" as="image" href="/textures/earth_specular_2048.jpg" />
+      </head>
       <body>{children}</body>
     </html>
   );
 }
-

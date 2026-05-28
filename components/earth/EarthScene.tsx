@@ -2,7 +2,7 @@
 
 import { OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ActiveEvent, DangerStatus } from "@/features/game/types";
 
@@ -60,9 +60,11 @@ type EventSelectionHandler = (event: ActiveEvent, anchor: { x: number; y: number
 
 function EarthMesh({
   events,
+  onReady,
   onSelectEvent
 }: {
   events: ActiveEvent[];
+  onReady?: () => void;
   onSelectEvent?: EventSelectionHandler;
 }) {
   const earthRef = useRef<THREE.Group>(null);
@@ -78,6 +80,10 @@ function EarthMesh({
   cloudMap.colorSpace = THREE.SRGBColorSpace;
   specularMap.colorSpace = THREE.NoColorSpace;
   normalMap.colorSpace = THREE.NoColorSpace;
+
+  useEffect(() => {
+    onReady?.();
+  }, [onReady]);
 
   useFrame((_, delta) => {
     if (earthRef.current) {
@@ -147,9 +153,11 @@ function EarthMesh({
 
 export function EarthScene({
   events,
+  onReady,
   onSelectEvent
 }: {
   events: ActiveEvent[];
+  onReady?: () => void;
   onSelectEvent?: EventSelectionHandler;
 }) {
   return (
@@ -162,7 +170,7 @@ export function EarthScene({
         <directionalLight position={[5, 2.7, 4]} intensity={3.8} castShadow color="#fff8ee" />
         <pointLight position={[-5, 1.6, 3.4]} color="#2f8cff" intensity={4.6} />
         <pointLight position={[3, -4, -6]} color="#4fffd2" intensity={1.35} />
-        <EarthMesh events={events} onSelectEvent={onSelectEvent} />
+        <EarthMesh events={events} onReady={onReady} onSelectEvent={onSelectEvent} />
         <OrbitControls
           autoRotate
           autoRotateSpeed={0.16}

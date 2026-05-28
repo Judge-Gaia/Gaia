@@ -1,14 +1,10 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Play } from "lucide-react";
+import { EarthSceneSafe } from "@/components/earth/EarthSceneSafe";
 import { useGameStore } from "@/features/game/game-store";
-
-const EarthSceneSafe = dynamic(() => import("@/components/earth/EarthSceneSafe").then((mod) => mod.EarthSceneSafe), {
-  ssr: false
-});
 
 export default function HomePage() {
   const router = useRouter();
