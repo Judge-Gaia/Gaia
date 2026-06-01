@@ -3,6 +3,7 @@
 import { type CSSProperties, useMemo, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage } from "./missionShared";
+import { CropArt, DroughtBackdrop, ReservoirArt } from "./missionArt";
 
 const SEGMENT_COUNT = 5;
 const CANAL_LEFT = 17;
@@ -61,11 +62,8 @@ export function DroughtMission({
       clearText="물길 회복"
       style={{ "--reach": String(reach) } as CSSProperties}
     >
-      <div className="drought-sky" aria-hidden="true">
-        <span className="drought-sun" />
-        <span className="heat-shimmer" />
-      </div>
-      <div className="drought-ground" aria-hidden="true" />
+      <DroughtBackdrop className="mission-backdrop" />
+      <div className="drought-heat" aria-hidden="true" />
 
       <MissionHud
         phase="관개 복구 작전"
@@ -78,7 +76,7 @@ export function DroughtMission({
       />
 
       <div className="reservoir" aria-hidden="true">
-        <span className="reservoir-water" />
+        <ReservoirArt className="reservoir-art" />
         <span className="reservoir-label">저수지</span>
       </div>
 
@@ -95,7 +93,7 @@ export function DroughtMission({
           <div className="canal-cell" key={index} style={{ left: `${left}%`, width: `${SEGMENT_WIDTH}%` } as CSSProperties}>
             <div className={`crop-field ${watered ? "watered" : "dry"}`}>
               <span className="field-soil" aria-hidden="true" />
-              <span className="field-crop" aria-hidden="true" />
+              <CropArt lush={watered} className="field-crop" />
             </div>
             <button
               aria-label={`수문 ${index + 1} 열기`}

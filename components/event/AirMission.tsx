@@ -3,6 +3,7 @@
 import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage, distance, pointerToPercent } from "./missionShared";
+import { AirBackdrop, FactoryStackArt } from "./missionArt";
 
 type Cloud = { id: string; x: number; y: number; density: number };
 
@@ -131,13 +132,7 @@ export function AirMission({
       }}
       onPointerLeave={() => setCursor((current) => ({ ...current, visible: false }))}
     >
-      <div className="air-skyline" aria-hidden="true">
-        <span className="sky-building b1" />
-        <span className="sky-building b2" />
-        <span className="sky-building b3" />
-        <span className="sky-building b4" />
-        <span className="sky-building b5" />
-      </div>
+      <AirBackdrop className="mission-backdrop" />
 
       <MissionHud
         phase="대기질 회복 작전"
@@ -181,8 +176,8 @@ export function AirMission({
               style={{ left: `${stack.x}%` } as CSSProperties}
               type="button"
             >
-              <span className="stack-body" aria-hidden="true" />
               <span className="stack-emit" aria-hidden="true" />
+              <FactoryStackArt filtered={isFiltered} className="stack-art" />
               <small className="target-hint">{isFiltered ? "필터 완료" : "필터 설치"}</small>
             </button>
           );

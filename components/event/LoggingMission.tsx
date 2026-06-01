@@ -3,6 +3,7 @@
 import { type CSSProperties, type PointerEvent, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage, distance, pointerToPercent } from "./missionShared";
+import { LoggingBackdrop, SaplingArt, TreeArt } from "./missionArt";
 
 type Stage = "empty" | "planted" | "grown";
 type Plot = { id: string; x: number; y: number; stage: Stage };
@@ -76,11 +77,7 @@ export function LoggingMission({
       clearText="복원 완료"
       stageRef={stageRef}
     >
-      <div className="logging-sky" aria-hidden="true">
-        <span className="logging-sun" />
-      </div>
-      <div className="logging-ridge" aria-hidden="true" />
-      <div className="logging-soil" aria-hidden="true" />
+      <LoggingBackdrop className="mission-backdrop" />
 
       <MissionHud
         phase="산림 복원 작전"
@@ -112,16 +109,11 @@ export function LoggingMission({
               onClick={() => water(plot.id)}
               type="button"
             >
-              <span className="sprout-stem" aria-hidden="true" />
+              <SaplingArt className="sprout-art" />
               <small className="target-hint">물 주기</small>
             </button>
           )}
-          {plot.stage === "grown" && (
-            <span className="plot-tree" aria-hidden="true">
-              <span className="tree-canopy" />
-              <span className="tree-trunk" />
-            </span>
-          )}
+          {plot.stage === "grown" && <TreeArt className="plot-tree" />}
         </div>
       ))}
 
@@ -164,13 +156,15 @@ export function LoggingMission({
           }}
           type="button"
         >
-          <span aria-hidden="true" />
+          <SaplingArt className="nursery-art" />
         </button>
         <span className="nursery-label">묘목 묘판</span>
       </div>
 
       {ghost.active && (
-        <span className="sapling-ghost" style={{ left: `${ghost.x}%`, top: `${ghost.y}%` }} aria-hidden="true" />
+        <span className="sapling-ghost" style={{ left: `${ghost.x}%`, top: `${ghost.y}%` }} aria-hidden="true">
+          <SaplingArt className="sapling-ghost-art" />
+        </span>
       )}
     </MissionStage>
   );

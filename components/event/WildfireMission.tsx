@@ -3,6 +3,7 @@
 import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage, distance, pointerToPercent } from "./missionShared";
+import { FlameArt, PineTreeArt, WildfireBackdrop } from "./missionArt";
 
 type Flame = { id: string; x: string; y: string; nx: number; ny: number; heat: number; scale: number };
 
@@ -131,16 +132,16 @@ export function WildfireMission({
       }}
       onPointerLeave={() => setCursor((current) => ({ ...current, visible: false }))}
     >
-      <div className="wildfire-sky" aria-hidden="true">
+      <WildfireBackdrop className="mission-backdrop" />
+      <div className="wildfire-forest" aria-hidden="true">
+        {[0, 1, 2, 3, 4, 5, 6].map((tree) => (
+          <PineTreeArt className="forest-tree" key={tree} />
+        ))}
+      </div>
+      <div className="wildfire-smoke" aria-hidden="true">
         <span className="smoke-plume plume-a" />
         <span className="smoke-plume plume-b" />
         <span className="smoke-plume plume-c" />
-      </div>
-      <div className="wildfire-ridge" aria-hidden="true" />
-      <div className="wildfire-forest" aria-hidden="true">
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((tree) => (
-          <span className="forest-tree" key={tree} style={{ "--tree": String(tree) } as CSSProperties} />
-        ))}
       </div>
 
       <MissionHud
@@ -169,7 +170,7 @@ export function WildfireMission({
               } as CSSProperties
             }
           >
-            <span className="flame-core" />
+            <FlameArt className="flame-art" />
             <span className="flame-glow" />
             <span className="flame-smoke" />
           </div>

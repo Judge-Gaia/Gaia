@@ -3,6 +3,7 @@
 import { type CSSProperties, useMemo, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage } from "./missionShared";
+import { OilBackdrop, OilBargeArt } from "./missionArt";
 
 type Slick = { id: string; x: number; y: number; size: number };
 
@@ -74,12 +75,9 @@ export function OilSpillMission({
       cleared={completedRef.current}
       clearText="방제 완료"
     >
-      <div className="oil-sea" aria-hidden="true">
-        <span className="oil-shimmer shimmer-a" />
-        <span className="oil-shimmer shimmer-b" />
-      </div>
+      <OilBackdrop className="mission-backdrop" />
       <div className="oil-barge" aria-hidden="true">
-        <span className="barge-deck" />
+        <OilBargeArt className="barge-art" />
         <span className="barge-label">방제선</span>
       </div>
 
@@ -122,8 +120,9 @@ export function OilSpillMission({
               const placed = booms.has(key);
               const rad = (angle * Math.PI) / 180;
               const radius = slick.size / 2 + 4;
-              const dx = Math.cos(rad) * radius;
-              const dy = Math.sin(rad) * radius;
+              // Round to avoid SSR/client float drift (hydration mismatch).
+              const dx = Math.round(Math.cos(rad) * radius * 100) / 100;
+              const dy = Math.round(Math.sin(rad) * radius * 100) / 100;
               return (
                 <button
                   aria-label="오일펜스 부표 설치"

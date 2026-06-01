@@ -3,13 +3,14 @@
 import { type CSSProperties, type PointerEvent, useMemo, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
 import { MissionHud, MissionStage, pointerToPercent } from "./missionShared";
+import { OceanBackdrop, RecycleBinArt, TrashArt, type TrashKind } from "./missionArt";
 
 type Category = "plastic" | "metal" | "other";
 
 type TrashItem = {
   id: string;
   label: string;
-  kind: "bottle" | "cup" | "can" | "glass" | "net" | "foam";
+  kind: TrashKind;
   category: Category;
   x: number;
   y: number;
@@ -109,25 +110,7 @@ export function OceanTrashMission({
       clearText="수거 완료"
       stageRef={stageRef}
     >
-      <div className="ocean-sky" aria-hidden="true">
-        <span className="ocean-sun" />
-        <span className="ocean-cloud cloud-a" />
-        <span className="ocean-cloud cloud-b" />
-        <span className="ocean-bird bird-a" />
-        <span className="ocean-bird bird-b" />
-      </div>
-      <div className="ocean-water" aria-hidden="true">
-        <span className="water-shimmer shimmer-a" />
-        <span className="water-shimmer shimmer-b" />
-        <span className="wave wave-a" />
-        <span className="wave wave-b" />
-        <span className="wave wave-c" />
-      </div>
-      <div className="beach-sand" aria-hidden="true">
-        <span className="sand-grain grain-a" />
-        <span className="sand-grain grain-b" />
-        <span className="sand-grain grain-c" />
-      </div>
+      <OceanBackdrop className="ocean-backdrop" />
 
       <MissionHud
         phase="해안 정화 작전"
@@ -149,8 +132,8 @@ export function OceanTrashMission({
             key={bin.category}
             style={{ left: `${bin.xMin}%`, width: `${bin.xMax - bin.xMin}%` } as CSSProperties}
           >
-            <span className="bin-mouth" />
-            <span className="bin-face">
+            <RecycleBinArt category={bin.category} className="bin-art" />
+            <span className="bin-plate">
               <strong>{bin.label}</strong>
               <small>{bin.hint}</small>
             </span>
@@ -198,7 +181,7 @@ export function OceanTrashMission({
             style={{ "--trash-index": String(index), left: `${item.x}%`, top: `${item.y}%` } as CSSProperties}
             type="button"
           >
-            <span aria-hidden="true" />
+            <TrashArt kind={item.kind} className="trash-art" />
             <small className="target-hint">{item.label}</small>
           </button>
         );
