@@ -37,6 +37,7 @@ type GameState = {
   resetGame: () => void;
   tick: (now?: number) => void;
   attemptSkill: (instanceId: string, skillId: SkillId, now?: number) => "resolved" | "wrong" | "missing";
+  completeEvent: (instanceId: string, now?: number) => "resolved" | "missing";
   consumeResolution: () => void;
   finishGame: (now?: number) => FinalSummary | null;
 };
@@ -254,6 +255,51 @@ export const useGameStore = create<GameState>()(
 
         return "resolved";
       },
+      completeEvent: (instanceId, now = Date.now()) => {
+        const state = get();
+        const event = state.activeEvents.find((item) => item.instanceId === instanceId);
+        if (!event) return "missing";
+
+        const definition = eventById.get(event.eventId);
+        if (!definition) return "missing";
+
+        const resolvedEvent: ResolvedEvent = {
+          instanceId: event.instanceId,
+          eventId: event.eventId,
+          resolvedAt: now,
+          resolvedStatus: event.status === "black" ? "red" : event.status
+        };
+        const nextResolved = [...state.resolvedEvents, resolvedEvent];
+        const nextActive = state.activeEvents.filter((item) => item.instanceId !== instanceId);
+        const nextPartial = {
+          ...state,
+          activeEvents: nextActive,
+          resolvedEvents: nextResolved
+        };
+        const additions = nextAchievements(nextPartial, now);
+        const nextAchievementsList = [...state.achievements, ...additions];
+        const nextState = {
+          ...nextPartial,
+          achievements: nextAchievementsList
+        };
+
+        set({
+          activeEvents: nextActive,
+          resolvedEvents: nextResolved,
+          achievements: nextAchievementsList,
+          lastResolution: {
+            eventId: definition.id,
+            title: definition.title,
+            message: definition.education.resolvedMessage,
+            realWorldContext: definition.education.realWorldContext,
+            lawOrPolicy: definition.education.lawOrPolicy,
+            actionHint: definition.education.actionHint
+          },
+          ...completeIfNeeded(nextState as GameState, now)
+        });
+
+        return "resolved";
+      },
       consumeResolution: () => {
         set({ lastResolution: null });
       },
@@ -296,4 +342,3 @@ export const useGameStore = create<GameState>()(
     }
   )
 );
-

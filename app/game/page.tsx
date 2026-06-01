@@ -2,17 +2,17 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Clock, Flag, MapPin, RotateCcw, ShieldAlert, ShieldCheck, Target, Timer, Zap } from "lucide-react";
 import { AchievementPanel } from "@/components/achievements/AchievementPanel";
 import { EventScene } from "@/components/event/EventScene";
+import { OceanTrashMission } from "@/components/event/OceanTrashMission";
 import { DangerBadge } from "@/components/game/DangerBadge";
 import { ResolutionModal } from "@/components/game/ResolutionModal";
-import { SkillDeck } from "@/components/skills/SkillDeck";
-import { eventById, skillById, TARGET_EVENT_COUNT } from "@/features/game/game-data";
+import { eventById, TARGET_EVENT_COUNT } from "@/features/game/game-data";
 import { useGameStore } from "@/features/game/game-store";
 import { formatDuration } from "@/features/game/scoring";
-import type { ActiveEvent, SkillId } from "@/features/game/types";
+import type { ActiveEvent } from "@/features/game/types";
 
 const EarthSceneSafe = dynamic(() => import("@/components/earth/EarthSceneSafe").then((mod) => mod.EarthSceneSafe), {
   ssr: false
@@ -36,11 +36,7 @@ export default function GamePage() {
   const router = useRouter();
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [selectedSnapshot, setSelectedSnapshot] = useState<Pick<ActiveEvent, "eventId" | "status" | "latitude" | "longitude"> | null>(null);
-  const [feedback, setFeedback] = useState("");
-  const [isResolvingSkill, setIsResolvingSkill] = useState(false);
-  const [equippedSkill, setEquippedSkill] = useState<SkillId | null>(null);
-  const [suppressionProgress, setSuppressionProgress] = useState(0);
-  const progressRef = useRef(0);
+  const [isCompletingMission, setIsCompletingMission] = useState(false);
   const resolutionTimerRef = useRef<number | null>(null);
   const {
     playerName,
@@ -50,7 +46,7 @@ export default function GamePage() {
     resolvedEvents,
     failedEvents,
     achievements,
-    attemptSkill,
+    completeEvent,
     consumeResolution,
     lastResolution,
     resetGame,
@@ -66,10 +62,7 @@ export default function GamePage() {
     (lastResolution ? { eventId: lastResolution.eventId, status: "red" as const, latitude: 0, longitude: 0 } : null);
   const definition = displayEvent ? eventById.get(displayEvent.eventId) : null;
   const neonTone = displayEvent?.status === "yellow" ? "safe" : "danger";
-  const recommendedSkills = useMemo(() => {
-    if (!definition) return [];
-    return definition.requiredSkillIds.map((id) => skillById.get(id)?.name ?? id);
-  }, [definition]);
+  const isOceanTrashMission = definition?.id === "ocean_trash";
 
   useEffect(() => {
     if (!playerName || !startedAt) {
@@ -100,10 +93,10 @@ export default function GamePage() {
   }, [selectedActiveEvent]);
 
   useEffect(() => {
-    if (selectedInstanceId && !selectedActiveEvent && !lastResolution && !isResolvingSkill) {
+    if (selectedInstanceId && !selectedActiveEvent && !lastResolution && !isCompletingMission) {
       closeEventPanel();
     }
-  }, [isResolvingSkill, lastResolution, selectedActiveEvent, selectedInstanceId]);
+  }, [isCompletingMission, lastResolution, selectedActiveEvent, selectedInstanceId]);
 
   useEffect(() => () => {
     if (resolutionTimerRef.current) {
@@ -116,63 +109,28 @@ export default function GamePage() {
   const closeEventPanel = () => {
     setSelectedInstanceId(null);
     setSelectedSnapshot(null);
-    setFeedback("");
-    setIsResolvingSkill(false);
-    setEquippedSkill(null);
-    setSuppressionProgress(0);
-    progressRef.current = 0;
+    setIsCompletingMission(false);
     if (resolutionTimerRef.current) {
       window.clearTimeout(resolutionTimerRef.current);
       resolutionTimerRef.current = null;
     }
   };
 
-  const handleSelectSkill = (skillId: SkillId) => {
-    if (isResolvingSkill) return;
-    if (selectedActiveEvent) {
-      setSelectedSnapshot({
-        eventId: selectedActiveEvent.eventId,
-        status: selectedActiveEvent.status,
-        latitude: selectedActiveEvent.latitude,
-        longitude: selectedActiveEvent.longitude
-      });
-    }
-
-    if (selectedActiveEvent && definition && definition.requiredSkillIds.includes(skillId)) {
-      setEquippedSkill(skillId);
-      progressRef.current = 0;
-      setSuppressionProgress(0);
-      setFeedback("");
-      return;
-    }
-
-    if (!selectedActiveEvent) {
-      closeEventPanel();
-      return;
-    }
-
-    setEquippedSkill(null);
-    progressRef.current = 0;
-    setSuppressionProgress(0);
-    setFeedback("이 상황에는 효과가 없는 도구입니다. 다른 도구를 선택하세요.");
-    window.setTimeout(() => setFeedback(""), 1800);
-  };
-
-  const handleOperate = (strength: number) => {
-    if (!selectedInstanceId || !selectedActiveEvent || !equippedSkill || isResolvingSkill || progressRef.current >= 1) return;
-    const progress = Math.min(1, progressRef.current + strength);
-    progressRef.current = progress;
-    setSuppressionProgress(progress);
-
-    if (progress < 1) return;
-
-    setIsResolvingSkill(true);
+  const handleMissionComplete = () => {
+    if (!selectedInstanceId || !selectedActiveEvent || isCompletingMission) return;
+    setSelectedSnapshot({
+      eventId: selectedActiveEvent.eventId,
+      status: selectedActiveEvent.status,
+      latitude: selectedActiveEvent.latitude,
+      longitude: selectedActiveEvent.longitude
+    });
+    setIsCompletingMission(true);
     resolutionTimerRef.current = window.setTimeout(() => {
-      const result = attemptSkill(selectedInstanceId, equippedSkill);
+      const result = completeEvent(selectedInstanceId);
       if (result === "missing") {
         closeEventPanel();
       }
-    }, 720);
+    }, 420);
   };
 
   return (
@@ -224,14 +182,18 @@ export default function GamePage() {
       {definition && displayEvent && (selectedInstanceId || lastResolution) && (
         <section className="game-event-overlay" aria-label="이벤트 대응 화면">
           <div className={`inline-event-stage neon-${neonTone}`}>
-            <EventScene
-              eventId={definition.id}
-              status={displayEvent.status}
-              activeSkill={equippedSkill}
-              interactionDisabled={isResolvingSkill || Boolean(lastResolution)}
-              onOperate={handleOperate}
-              suppressionProgress={suppressionProgress}
-            />
+            {isOceanTrashMission ? (
+              <OceanTrashMission
+                disabled={isCompletingMission || Boolean(lastResolution)}
+                status={displayEvent.status}
+                onComplete={handleMissionComplete}
+              />
+            ) : (
+              <EventScene
+                eventId={definition.id}
+                status={displayEvent.status}
+              />
+            )}
             <div className="event-info">
               <DangerBadge status={displayEvent.status} />
               <h1>{definition.title}</h1>
@@ -239,8 +201,8 @@ export default function GamePage() {
               <div className="mission-brief">
                 <h3><Target size={15} /> 미션 브리핑</h3>
                 <ul>
-                  <li>목표: 도구를 조작해 재난 확산을 차단하세요.</li>
-                  <li>필요 도구: {recommendedSkills.join(", ")}</li>
+                  <li>목표: 현장 안의 문제 요소를 직접 조작해 해결하세요.</li>
+                  <li>{isOceanTrashMission ? "쓰레기를 끌어서 오른쪽 수거함에 정확히 버리세요." : "이 이벤트의 직접 조작 미션은 준비 중입니다."}</li>
                   <li>대응 한계: {deadlineByStatus[displayEvent.status]}</li>
                 </ul>
               </div>
@@ -270,27 +232,6 @@ export default function GamePage() {
                 지구로
               </button>
             </div>
-            {feedback && <div className="toast">{feedback}</div>}
-            {equippedSkill && (
-              <div className="operation-console" role="status">
-                <div>
-                  <strong>{definition.interaction.toolLabel}</strong>
-                  <span>{definition.interaction.instruction}</span>
-                </div>
-                <label>
-                  {definition.interaction.progressLabel}
-                  <b>{Math.round(suppressionProgress * 100)}%</b>
-                </label>
-                <div className="operation-meter">
-                  <i style={{ width: `${suppressionProgress * 100}%` }} />
-                </div>
-              </div>
-            )}
-            <SkillDeck
-              activeSkill={equippedSkill}
-              disabled={Boolean(lastResolution) || isResolvingSkill}
-              onSelect={handleSelectSkill}
-            />
           </div>
         </section>
       )}
