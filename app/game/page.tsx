@@ -3,11 +3,9 @@
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Clock, Flag, MapPin, RotateCcw, ShieldAlert, ShieldCheck, Target, Timer, Zap } from "lucide-react";
+import { ArrowLeft, Clock, Flag, RotateCcw, ShieldCheck } from "lucide-react";
 import { AchievementPanel } from "@/components/achievements/AchievementPanel";
-import { EventScene } from "@/components/event/EventScene";
-import { OceanTrashMission } from "@/components/event/OceanTrashMission";
-import { DangerBadge } from "@/components/game/DangerBadge";
+import { EventMiniGame } from "@/components/event/EventMiniGame";
 import { ResolutionModal } from "@/components/game/ResolutionModal";
 import { eventById, TARGET_EVENT_COUNT } from "@/features/game/game-data";
 import { useGameStore } from "@/features/game/game-store";
@@ -17,20 +15,6 @@ import type { ActiveEvent } from "@/features/game/types";
 const EarthSceneSafe = dynamic(() => import("@/components/earth/EarthSceneSafe").then((mod) => mod.EarthSceneSafe), {
   ssr: false
 });
-
-function statusPercent(status: ActiveEvent["status"]) {
-  if (status === "yellow") return 24;
-  if (status === "orange") return 53;
-  if (status === "red") return 81;
-  return 100;
-}
-
-const deadlineByStatus: Record<ActiveEvent["status"], string> = {
-  yellow: "45초 이내 안정화",
-  orange: "30초 이내 개입 필요",
-  red: "15초 내 긴급 대응",
-  black: "임계 도달"
-};
 
 export default function GamePage() {
   const router = useRouter();
@@ -62,7 +46,6 @@ export default function GamePage() {
     (lastResolution ? { eventId: lastResolution.eventId, status: "red" as const, latitude: 0, longitude: 0 } : null);
   const definition = displayEvent ? eventById.get(displayEvent.eventId) : null;
   const neonTone = displayEvent?.status === "yellow" ? "safe" : "danger";
-  const isOceanTrashMission = definition?.id === "ocean_trash";
 
   useEffect(() => {
     if (!playerName || !startedAt) {
@@ -182,56 +165,16 @@ export default function GamePage() {
       {definition && displayEvent && (selectedInstanceId || lastResolution) && (
         <section className="game-event-overlay" aria-label="이벤트 대응 화면">
           <div className={`inline-event-stage neon-${neonTone}`}>
-            {isOceanTrashMission ? (
-              <OceanTrashMission
-                disabled={isCompletingMission || Boolean(lastResolution)}
-                status={displayEvent.status}
-                onComplete={handleMissionComplete}
-              />
-            ) : (
-              <EventScene
-                eventId={definition.id}
-                status={displayEvent.status}
-              />
-            )}
-            <div className="event-info">
-              <DangerBadge status={displayEvent.status} />
-              <h1>{definition.title}</h1>
-              <p>{definition.description}</p>
-              <div className="mission-brief">
-                <h3><Target size={15} /> 미션 브리핑</h3>
-                <ul>
-                  <li>목표: 현장 안의 문제 요소를 직접 조작해 해결하세요.</li>
-                  <li>{isOceanTrashMission ? "쓰레기를 끌어서 오른쪽 수거함에 정확히 버리세요." : "이 이벤트의 직접 조작 미션은 준비 중입니다."}</li>
-                  <li>대응 한계: {deadlineByStatus[displayEvent.status]}</li>
-                </ul>
-              </div>
-              <div className="event-meta-grid">
-                <div className="event-meta-card">
-                  <span><ShieldAlert size={14} /> 위험 확산</span>
-                  <strong>{statusPercent(displayEvent.status)}%</strong>
-                  <div className="threat-meter"><i style={{ width: `${statusPercent(displayEvent.status)}%` }} /></div>
-                </div>
-                <div className="event-meta-card">
-                  <span><MapPin size={14} /> 좌표</span>
-                  <strong>
-                    {displayEvent.latitude.toFixed(1)}, {displayEvent.longitude.toFixed(1)}
-                  </strong>
-                </div>
-                <div className="event-meta-card">
-                  <span><Timer size={14} /> 대응 윈도우</span>
-                  <strong>{deadlineByStatus[displayEvent.status]}</strong>
-                </div>
-                <div className="event-meta-card">
-                  <span><Zap size={14} /> 작전 우선도</span>
-                  <strong>{displayEvent.status === "yellow" ? "중간" : displayEvent.status === "orange" ? "높음" : "최우선"}</strong>
-                </div>
-              </div>
-              <button className="secondary-button" onClick={closeEventPanel} style={{ marginTop: 16 }}>
-                <ArrowLeft size={17} aria-hidden="true" />
-                지구로
-              </button>
-            </div>
+            <EventMiniGame
+              disabled={isCompletingMission || Boolean(lastResolution)}
+              eventId={definition.id}
+              status={displayEvent.status}
+              onComplete={handleMissionComplete}
+            />
+            <button className="mission-back-button" onClick={closeEventPanel}>
+              <ArrowLeft size={17} aria-hidden="true" />
+              지구로
+            </button>
           </div>
         </section>
       )}
