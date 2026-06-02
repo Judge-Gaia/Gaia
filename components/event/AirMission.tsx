@@ -173,6 +173,7 @@ export function AirMission({
               disabled={disabled || isFiltered}
               key={stack.id}
               onClick={() => filterStack(stack.id)}
+              onPointerDown={(event) => event.stopPropagation()}
               style={{ left: `${stack.x}%` } as CSSProperties}
               type="button"
             >

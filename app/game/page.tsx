@@ -24,6 +24,7 @@ export default function GamePage() {
   const resolutionTimerRef = useRef<number | null>(null);
   const {
     playerName,
+    gameMode,
     startedAt,
     completedAt,
     activeEvents,
@@ -138,7 +139,9 @@ export default function GamePage() {
           <div className="floating-hud" aria-label="게임 상태">
             <div className="hud-pill">
               <Flag size={17} aria-hidden="true" />
-              {resolvedEvents.length + failedEvents.length}/{TARGET_EVENT_COUNT}
+              {gameMode === "ultra"
+                ? `${resolvedEvents.length + failedEvents.length} / 무한`
+                : `${resolvedEvents.length + failedEvents.length}/${TARGET_EVENT_COUNT}`}
             </div>
             <div className="hud-pill">
               <ShieldCheck size={17} aria-hidden="true" />
@@ -148,6 +151,15 @@ export default function GamePage() {
               <Clock size={17} aria-hidden="true" />
               {formatDuration(elapsed)}
             </div>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                router.push("/result");
+              }}
+            >
+              <Flag size={17} aria-hidden="true" />
+              작전 종료
+            </button>
             <button
               className="secondary-button"
               onClick={() => {

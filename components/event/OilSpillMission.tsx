@@ -6,6 +6,10 @@ import { MissionHud, MissionStage } from "./missionShared";
 import { OilBackdrop, OilBargeArt } from "./missionArt";
 
 type Slick = { id: string; x: number; y: number; size: number };
+type OilSlickStyle = CSSProperties & {
+  "--boom-size": string;
+  "--size": string;
+};
 
 const SLICKS: Slick[] = [
   { id: "slick-a", x: 27, y: 56, size: 200 },
@@ -13,7 +17,8 @@ const SLICKS: Slick[] = [
   { id: "slick-c", x: 75, y: 62, size: 180 }
 ];
 
-const BUOY_ANGLES = [40, 140, 220, 320];
+const BOOM_GAP = 8;
+const BUOY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
 export function OilSpillMission({
   disabled = false,
@@ -97,29 +102,34 @@ export function OilSpillMission({
       {SLICKS.map((slick) => {
         const isContained = contained.has(slick.id);
         const isSkimmed = skimmed.has(slick.id);
+        const style = {
+          "--boom-size": `${slick.size + BOOM_GAP * 2}px`,
+          "--size": `${slick.size}px`,
+          left: `${slick.x}%`,
+          top: `${slick.y}%`
+        } as OilSlickStyle;
         return (
           <div
             className={`oil-cluster ${isContained ? "contained" : ""} ${isSkimmed ? "skimmed" : ""}`}
             key={slick.id}
-            style={{ left: `${slick.x}%`, top: `${slick.y}%` } as CSSProperties}
+            style={style}
           >
             <button
               aria-label="기름띠 회수"
               className="oil-slick"
               disabled={disabled || !isContained || isSkimmed}
               onClick={() => skim(slick.id)}
-              style={{ "--size": `${slick.size}px` } as CSSProperties}
               type="button"
             >
               <span className="slick-sheen" aria-hidden="true" />
               {isContained && !isSkimmed && <small className="slick-hint">회수</small>}
             </button>
-            <span className="boom-ring" style={{ "--size": `${slick.size}px` } as CSSProperties} aria-hidden="true" />
+            <span className="boom-ring" aria-hidden="true" />
             {BUOY_ANGLES.map((angle, index) => {
               const key = `${slick.id}:${index}`;
               const placed = booms.has(key);
               const rad = (angle * Math.PI) / 180;
-              const radius = slick.size / 2 + 4;
+              const radius = slick.size / 2 + BOOM_GAP;
               // Round to avoid SSR/client float drift (hydration mismatch).
               const dx = Math.round(Math.cos(rad) * radius * 100) / 100;
               const dy = Math.round(Math.sin(rad) * radius * 100) / 100;

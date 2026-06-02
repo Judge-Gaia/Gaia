@@ -1,5 +1,7 @@
 export type SkillId = "rain" | "wind" | "purify" | "grow";
 
+export type GameMode = "basic" | "ultra";
+
 export type DangerStatus = "yellow" | "orange" | "red" | "black";
 
 export type EventDefinition = {

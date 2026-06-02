@@ -11,7 +11,16 @@ import {
   TARGET_EVENT_COUNT
 } from "./game-data";
 import { calculateScore } from "./scoring";
-import type { Achievement, ActiveEvent, DangerStatus, FailedEvent, FinalSummary, ResolvedEvent, SkillId } from "./types";
+import type {
+  Achievement,
+  ActiveEvent,
+  DangerStatus,
+  FailedEvent,
+  FinalSummary,
+  GameMode,
+  ResolvedEvent,
+  SkillId
+} from "./types";
 
 type ResolutionNotice = {
   eventId: string;
@@ -24,6 +33,7 @@ type ResolutionNotice = {
 
 type GameState = {
   playerName: string;
+  gameMode: GameMode;
   startedAt: number | null;
   completedAt: number | null;
   targetEventCount: number;
@@ -33,7 +43,7 @@ type GameState = {
   achievements: Achievement[];
   lastResolution: ResolutionNotice | null;
   finalSummary: FinalSummary | null;
-  startGame: (playerName: string) => void;
+  startGame: (playerName: string, gameMode?: GameMode) => void;
   resetGame: () => void;
   tick: (now?: number) => void;
   attemptSkill: (instanceId: string, skillId: SkillId, now?: number) => "resolved" | "wrong" | "missing";
@@ -97,6 +107,10 @@ function nextAchievements(state: Pick<GameState, "resolvedEvents" | "failedEvent
 }
 
 function completeIfNeeded(state: GameState, now: number): Partial<GameState> {
+  if (state.gameMode === "ultra") {
+    return {};
+  }
+
   const processed = state.resolvedEvents.length + state.failedEvents.length;
   if (processed < state.targetEventCount || state.completedAt) {
     return {};
@@ -128,6 +142,7 @@ export const useGameStore = create<GameState>()(
   persist(
     (set, get) => ({
       playerName: "",
+      gameMode: "basic",
       startedAt: null,
       completedAt: null,
       targetEventCount: TARGET_EVENT_COUNT,
@@ -137,10 +152,11 @@ export const useGameStore = create<GameState>()(
       achievements: [],
       lastResolution: null,
       finalSummary: null,
-      startGame: (playerName) => {
+      startGame: (playerName, gameMode = "basic") => {
         const now = Date.now();
         set({
           playerName: playerName.trim(),
+          gameMode,
           startedAt: now,
           completedAt: null,
           targetEventCount: TARGET_EVENT_COUNT,
@@ -155,6 +171,7 @@ export const useGameStore = create<GameState>()(
       resetGame: () => {
         set({
           playerName: "",
+          gameMode: "basic",
           startedAt: null,
           completedAt: null,
           activeEvents: [],
@@ -183,9 +200,9 @@ export const useGameStore = create<GameState>()(
         const resolvedCount = state.resolvedEvents.length;
         const failedCount = state.failedEvents.length + failedNow.length;
         const totalCreated = resolvedCount + failedCount + stillActive.length;
-        const remainingToCreate = state.targetEventCount - totalCreated;
         const slots = Math.max(0, MAX_ACTIVE_EVENTS - stillActive.length);
-        const spawnCount = Math.min(remainingToCreate, slots);
+        const remainingToCreate = state.gameMode === "ultra" ? slots : state.targetEventCount - totalCreated;
+        const spawnCount = Math.min(Math.max(0, remainingToCreate), slots);
         const spawned = Array.from({ length: spawnCount }, (_, index) => createEvent(totalCreated + index, now));
 
         const nextState = {
@@ -330,6 +347,7 @@ export const useGameStore = create<GameState>()(
       name: "gaia-game-v1",
       partialize: (state) => ({
         playerName: state.playerName,
+        gameMode: state.gameMode,
         startedAt: state.startedAt,
         completedAt: state.completedAt,
         targetEventCount: state.targetEventCount,

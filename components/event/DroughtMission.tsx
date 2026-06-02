@@ -33,7 +33,7 @@ export function DroughtMission({
   }, [open]);
 
   const toggle = (index: number) => {
-    if (disabled || open[index]) return;
+    if (disabled || open[index] || index !== reach) return;
     setOpen((current) => {
       const next = current.slice();
       next[index] = true;
@@ -98,7 +98,7 @@ export function DroughtMission({
             <button
               aria-label={`수문 ${index + 1} 열기`}
               className={`canal-gate ${isOpen ? "open" : ""} ${watered ? "flowing" : ""} ${isNext ? "next" : ""}`}
-              disabled={disabled || isOpen}
+              disabled={disabled || isOpen || !isNext}
               onClick={() => toggle(index)}
               type="button"
             >

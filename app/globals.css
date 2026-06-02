@@ -237,8 +237,36 @@ a {
 .start-form {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   max-width: 560px;
+}
+
+.mode-selector {
+  background: rgba(5, 14, 32, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  width: 100%;
+}
+
+.mode-option {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  font-weight: 900;
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.mode-option-active {
+  background: linear-gradient(135deg, rgba(82, 255, 194, 0.96), rgba(86, 217, 255, 0.92));
+  color: #020914;
+  box-shadow: 0 0 24px rgba(86, 217, 255, 0.18);
 }
 
 .start-form input {
@@ -2274,11 +2302,11 @@ a {
   0%,
   100% {
     border-radius: 49% 42% 54% 45%;
-    transform: rotate(-1deg);
+    transform: translate(-50%, -50%) rotate(-1deg);
   }
   50% {
     border-radius: 42% 56% 45% 55%;
-    transform: rotate(2deg);
+    transform: translate(-50%, -50%) rotate(2deg);
   }
 }
 
@@ -3249,8 +3277,10 @@ a {
 }
 
 .oil-cluster {
+  height: var(--boom-size, 248px);
   position: absolute;
   transform: translate(-50%, -50%);
+  width: var(--boom-size, 248px);
   z-index: 8;
 }
 
@@ -3304,17 +3334,19 @@ a {
 }
 
 .boom-ring {
-  border: 4px dashed rgba(255, 196, 92, 0.28);
+  background:
+    radial-gradient(circle, transparent calc(50% - 5px), rgba(255, 196, 92, 0.22) calc(50% - 4px), transparent calc(50% + 5px));
+  border: 3px dashed rgba(255, 196, 92, 0.38);
   border-radius: 50%;
-  height: calc(var(--size, 200px) + 18px);
+  height: var(--boom-size, 248px);
   left: 50%;
-  opacity: 0;
+  opacity: 0.58;
   pointer-events: none;
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
-  transition: opacity 240ms ease, transform 240ms ease;
-  width: calc(var(--size, 200px) + 18px);
+  transform: translate(-50%, -50%);
+  transition: border-color 240ms ease, box-shadow 240ms ease, opacity 240ms ease;
+  width: var(--boom-size, 248px);
 }
 
 .oil-cluster.contained .boom-ring {
@@ -3322,20 +3354,19 @@ a {
   border-color: rgba(255, 196, 92, 0.9);
   box-shadow: 0 0 22px rgba(255, 180, 80, 0.5), inset 0 0 22px rgba(255, 180, 80, 0.3);
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
 }
 
 .oil-buoy {
   background: transparent;
   border: 0;
   cursor: pointer;
-  height: 44px;
+  height: 34px;
   left: 50%;
   padding: 0;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%) translate(var(--dx, 0), var(--dy, 0));
-  width: 44px;
+  width: 34px;
   z-index: 2;
 }
 
@@ -3345,9 +3376,9 @@ a {
   border-radius: 50%;
   box-shadow: 0 0 0 4px rgba(255, 196, 92, 0.18);
   display: block;
-  height: 22px;
-  margin: 11px auto;
-  width: 22px;
+  height: 20px;
+  margin: 7px auto;
+  width: 20px;
 }
 
 .oil-buoy::after {
@@ -3355,12 +3386,12 @@ a {
   border: 1px solid rgba(255, 214, 140, 0.6);
   border-radius: 50%;
   content: "";
-  height: 30px;
+  height: 34px;
   left: 50%;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 30px;
+  width: 34px;
 }
 
 .oil-buoy.placed {
