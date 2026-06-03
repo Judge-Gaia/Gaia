@@ -54,6 +54,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "한국은 산림보호법을 통해 산불 예방, 진화, 산림 보호 의무를 다룹니다.",
       actionHint: "야외 불씨 관리, 입산 통제 준수, 쓰레기 소각 금지가 산불 예방의 핵심입니다."
+    },
+    sdgInfo: {
+      number: 15,
+      title: "육상생태계 보전",
+      englishTitle: "Life on Land",
+      color: "#56C02B"
     }
   },
   {
@@ -77,6 +83,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "해양폐기물 및 해양오염퇴적물 관리법은 해양폐기물 발생 예방과 수거, 처리 체계를 규정합니다.",
       actionHint: "일회용품 사용을 줄이고, 하천과 해안 주변 쓰레기가 바다로 흘러가지 않게 막아야 합니다."
+    },
+    sdgInfo: {
+      number: 14,
+      title: "해양생태계 보전",
+      englishTitle: "Life Below Water",
+      color: "#0A97D9"
     }
   },
   {
@@ -100,6 +112,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "해양환경관리법은 해양오염 방지와 방제 조치를 다룹니다.",
       actionHint: "선박 안전 관리와 사고 초기 방제가 피해 규모를 크게 줄입니다."
+    },
+    sdgInfo: {
+      number: 14,
+      title: "해양생태계 보전",
+      englishTitle: "Life Below Water",
+      color: "#0A97D9"
     }
   },
   {
@@ -123,6 +141,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "산림자원의 조성 및 관리에 관한 법률은 산림의 지속 가능한 조성과 관리를 다룹니다.",
       actionHint: "인증 목재 사용, 산림 훼손 신고, 복원 사업 참여가 숲 보호에 도움이 됩니다."
+    },
+    sdgInfo: {
+      number: 15,
+      title: "육상생태계 보전",
+      englishTitle: "Life on Land",
+      color: "#56C02B"
     }
   },
   {
@@ -146,6 +170,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "대기환경보전법은 대기오염물질 배출 관리와 생활환경 보호를 다룹니다.",
       actionHint: "대중교통 이용, 에너지 절약, 배출 사업장 관리가 대기 오염을 줄입니다."
+    },
+    sdgInfo: {
+      number: 13,
+      title: "기후변화 대응",
+      englishTitle: "Climate Action",
+      color: "#3F7E44"
     }
   },
   {
@@ -169,6 +199,12 @@ export const eventDefinitions: EventDefinition[] = [
       lawOrPolicy:
         "물관리기본법은 물의 공공성과 지속 가능한 물 관리를 기본 원칙으로 삼습니다.",
       actionHint: "물 절약, 빗물 활용, 지역 물 관리 정책 참여가 가뭄 대응력을 높입니다."
+    },
+    sdgInfo: {
+      number: 13,
+      title: "기후변화 대응",
+      englishTitle: "Climate Action",
+      color: "#3F7E44"
     }
   }
 ];

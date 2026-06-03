@@ -9,6 +9,13 @@ export type GameMode = "basic" | "ultra";
 
 export type DangerStatus = "yellow" | "orange" | "red" | "black";
 
+export type SdgInfo = {
+  number: 13 | 14 | 15;
+  title: string;
+  englishTitle: string;
+  color: string;
+};
+
 export type EventDefinition = {
   id: string;
   title: string;
@@ -29,6 +36,7 @@ export type EventDefinition = {
     lawOrPolicy: string;
     actionHint: string;
   };
+  sdgInfo: SdgInfo;
 };
 
 export type SkillDefinition = {
@@ -75,6 +83,7 @@ export type RunStats = {
 
 export type FinalSummary = {
   playerName: string;
+  gameMode: GameMode;
   score: number;
   durationSeconds: number;
   resolvedCount: number;

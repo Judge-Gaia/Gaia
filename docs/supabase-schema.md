@@ -22,11 +22,12 @@ create table public.rankings (
   duration_seconds integer not null check (duration_seconds >= 0),
   resolved_count integer not null check (resolved_count >= 0),
   failed_count integer not null check (failed_count >= 0),
+  game_mode text not null default 'basic',
   created_at timestamptz not null default now()
 );
 
 create index rankings_score_idx
-  on public.rankings (score desc, duration_seconds asc, created_at asc);
+  on public.rankings (game_mode, score desc, duration_seconds asc, created_at asc);
 ```
 
 ## achievement_records
@@ -75,12 +76,15 @@ create policy "achievement records are readable"
 select count(*) + 1 as rank
 from public.rankings
 where
-  score > :score
-  or (score = :score and duration_seconds < :duration_seconds)
-  or (
-    score = :score
-    and duration_seconds = :duration_seconds
-    and created_at < :created_at
+  game_mode = :game_mode
+  and (
+    score > :score
+    or (score = :score and duration_seconds < :duration_seconds)
+    or (
+      score = :score
+      and duration_seconds = :duration_seconds
+      and created_at < :created_at
+    )
   );
 ```
 

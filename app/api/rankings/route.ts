@@ -8,10 +8,14 @@ const rankingSchema = z.object({
   durationSeconds: z.number().int().min(0),
   resolvedCount: z.number().int().min(0),
   failedCount: z.number().int().min(0),
-  achievements: z.array(z.string().min(1)).max(30)
+  achievements: z.array(z.string().min(1)).max(30),
+  gameMode: z.enum(["basic", "ultra"]).optional().default("basic")
 });
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const mode = searchParams.get("mode") || "basic";
+
   const supabase = createSupabaseAdmin();
 
   if (!supabase) {
@@ -21,6 +25,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("rankings")
     .select("id, player_name, score, duration_seconds, resolved_count, failed_count, created_at")
+    .eq("game_mode", mode)
     .order("score", { ascending: false })
     .order("duration_seconds", { ascending: true })
     .order("created_at", { ascending: true })
@@ -66,7 +71,8 @@ export async function POST(request: Request) {
       score: payload.score,
       duration_seconds: payload.durationSeconds,
       resolved_count: payload.resolvedCount,
-      failed_count: payload.failedCount
+      failed_count: payload.failedCount,
+      game_mode: payload.gameMode
     })
     .select("id, created_at")
     .single();
@@ -91,6 +97,7 @@ export async function POST(request: Request) {
   const { count, error: rankError } = await supabase
     .from("rankings")
     .select("id", { count: "exact", head: true })
+    .eq("game_mode", payload.gameMode)
     .or(
       `score.gt.${payload.score},and(score.eq.${payload.score},duration_seconds.lt.${payload.durationSeconds}),and(score.eq.${payload.score},duration_seconds.eq.${payload.durationSeconds},created_at.lt.${data.created_at})`
     );
@@ -105,4 +112,3 @@ export async function POST(request: Request) {
     rank: (count ?? 0) + 1
   });
 }
-

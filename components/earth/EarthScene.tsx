@@ -105,7 +105,7 @@ function EarthMesh({
   return (
     <group ref={earthRef} rotation={[0.16, -0.62, -0.12]}>
       <mesh castShadow receiveShadow>
-        <sphereGeometry args={[2.55, 160, 160]} />
+        <sphereGeometry args={[2.55, 64, 64]} />
         <meshPhongMaterial
           map={earthMap}
           normalMap={normalMap}
@@ -116,15 +116,15 @@ function EarthMesh({
         />
       </mesh>
       <mesh ref={cloudsRef}>
-        <sphereGeometry args={[2.59, 160, 160]} />
+        <sphereGeometry args={[2.59, 64, 64]} />
         <meshLambertMaterial map={cloudMap} transparent opacity={0.42} depthWrite={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[2.68, 160, 160]} />
+        <sphereGeometry args={[2.68, 64, 64]} />
         <meshBasicMaterial color="#58dfff" transparent opacity={0.13} side={THREE.BackSide} />
       </mesh>
       <mesh scale={[1.035, 1.035, 1.035]}>
-        <sphereGeometry args={[2.68, 160, 160]} />
+        <sphereGeometry args={[2.68, 64, 64]} />
         <meshBasicMaterial color="#1f8fff" transparent opacity={0.07} blending={THREE.AdditiveBlending} />
       </mesh>
       {events.map((activeEvent) => {
@@ -133,11 +133,11 @@ function EarthMesh({
         return (
           <group key={activeEvent.instanceId} position={position}>
             <mesh onClick={(event) => handlePointClick(event, activeEvent.instanceId)}>
-              <sphereGeometry args={[0.07, 32, 32]} />
+              <sphereGeometry args={[0.07, 16, 16]} />
               <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.6} />
             </mesh>
             <mesh onClick={(event) => handlePointClick(event, activeEvent.instanceId)}>
-              <sphereGeometry args={[0.21, 32, 32]} />
+              <sphereGeometry args={[0.21, 16, 16]} />
               <meshBasicMaterial color={color} transparent opacity={0.14} blending={THREE.AdditiveBlending} />
             </mesh>
             <mesh>

@@ -12,9 +12,9 @@ type OilSlickStyle = CSSProperties & {
 };
 
 const SLICKS: Slick[] = [
-  { id: "slick-a", x: 27, y: 56, size: 200 },
-  { id: "slick-b", x: 55, y: 46, size: 240 },
-  { id: "slick-c", x: 75, y: 62, size: 180 }
+  { id: "slick-a", x: 24, y: 62, size: 200 },
+  { id: "slick-b", x: 52, y: 53, size: 240 },
+  { id: "slick-c", x: 78, y: 66, size: 180 }
 ];
 
 const BOOM_GAP = 8;

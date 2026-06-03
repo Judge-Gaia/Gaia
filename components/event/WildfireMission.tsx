@@ -17,9 +17,9 @@ const FLAME_SEEDS: Array<{ x: number; y: number; scale: number }> = [
 ];
 
 const SPRAY_RADIUS = 13; // % of stage
-const DRAIN_PER_SEC = 0.34; // water tank usage while spraying
-const REFILL_PER_SEC = 0.46; // tank recovery while idle
-const DOUSE_PER_SEC = 0.78; // heat removed at point-blank range
+const DRAIN_PER_SEC = 0.16; // water tank usage while spraying (runs out in ~6.2s)
+const REFILL_PER_SEC = 0.55; // tank recovery while idle (refills in ~1.8s)
+const DOUSE_PER_SEC = 0.85; // heat removed at point-blank range
 
 export function WildfireMission({
   disabled = false,
@@ -45,8 +45,10 @@ export function WildfireMission({
   );
   const waterRef = useRef(1);
   const completedRef = useRef(false);
+  const depletedRef = useRef(false);
   const [flames, setFlames] = useState<Flame[]>(flamesRef.current);
   const [water, setWater] = useState(1);
+  const [depleted, setDepleted] = useState(false);
   const [spraying, setSpraying] = useState(false);
   const [cursor, setCursor] = useState({ x: 50, y: 60, visible: false });
 
@@ -56,17 +58,32 @@ export function WildfireMission({
     const step = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      const active = pointer.current.active && !disabled;
-      const hasWater = waterRef.current > 0.02;
 
-      if (active && hasWater) {
+      // Update depleted state
+      if (waterRef.current <= 0.001) {
+        if (!depletedRef.current) {
+          depletedRef.current = true;
+          setDepleted(true);
+        }
+      }
+      if (waterRef.current >= 0.3) { // Require at least 30% water to recover from depleted state
+        if (depletedRef.current) {
+          depletedRef.current = false;
+          setDepleted(false);
+        }
+      }
+
+      const active = pointer.current.active && !disabled;
+      const canSpray = active && !depletedRef.current;
+
+      if (canSpray) {
         waterRef.current = Math.max(0, waterRef.current - DRAIN_PER_SEC * dt);
       } else {
         waterRef.current = Math.min(1, waterRef.current + REFILL_PER_SEC * dt);
       }
 
       let changed = false;
-      if (active && hasWater) {
+      if (canSpray) {
         for (const flame of flamesRef.current) {
           if (flame.heat <= 0) continue;
           const d = distance(pointer.current.x, pointer.current.y, flame.nx, flame.ny);
@@ -100,7 +117,8 @@ export function WildfireMission({
 
   const remaining = flames.filter((flame) => flame.heat > 0.05).length;
   const progress = 1 - flames.reduce((sum, flame) => sum + Math.max(0, flame.heat), 0) / flames.length;
-  const lowWater = water < 0.18;
+  const lowWater = water < 0.18 || depleted;
+  const isActuallySpraying = spraying && water > 0 && !depleted;
 
   return (
     <MissionStage
@@ -110,7 +128,7 @@ export function WildfireMission({
       disabled={disabled}
       cleared={completedRef.current}
       clearText="진압 완료"
-      style={{ "--spray": spraying ? "1" : "0" } as CSSProperties}
+      style={{ "--spray": isActuallySpraying ? "1" : "0" } as CSSProperties}
       stageRef={stageRef}
       onPointerDown={(event) => {
         if (disabled) return;
@@ -147,7 +165,13 @@ export function WildfireMission({
       <MissionHud
         phase="긴급 진화 작전"
         title="번지는 불길을 잡으세요"
-        instruction={lowWater ? "물탱크가 비었습니다. 잠시 손을 떼 재충전하세요." : "불길을 누른 채 쓸어 물을 분사하세요."}
+        instruction={
+          depleted
+            ? "물탱크가 완전히 비었습니다! 잠시 마우스를 떼 재충전하세요."
+            : lowWater
+              ? "물탱크가 얼마 남지 않았습니다. 잠시 쉬어서 재충전할 수 있습니다."
+              : "불길을 누른 채 쓸어 물을 분사하세요."
+        }
         progress={progress}
         countLabel={`${flames.length - remaining} / ${flames.length}`}
         badgeLabel={`잔불 ${remaining}`}
@@ -178,7 +202,7 @@ export function WildfireMission({
       })}
 
       <div
-        className={`hose-cursor ${spraying ? "spraying" : ""} ${lowWater ? "empty" : ""}`}
+        className={`hose-cursor ${isActuallySpraying ? "spraying" : ""} ${lowWater ? "empty" : ""}`}
         style={{ left: `${cursor.x}%`, top: `${cursor.y}%`, opacity: cursor.visible ? 1 : 0 }}
         aria-hidden="true"
       >

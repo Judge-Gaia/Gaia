@@ -21,7 +21,8 @@ import type {
   Location,
   RunStats,
   ResolvedEvent,
-  SkillId
+  SkillId,
+  SdgInfo
 } from "./types";
 
 type ResolutionNotice = {
@@ -31,6 +32,7 @@ type ResolutionNotice = {
   realWorldContext: string;
   lawOrPolicy: string;
   actionHint: string;
+  sdgInfo: SdgInfo;
 };
 
 type GameState = {
@@ -122,17 +124,20 @@ function nextAchievements(state: Pick<GameState, "resolvedEvents" | "failedEvent
 
 function completeIfNeeded(state: GameState, now: number): Partial<GameState> {
   if (state.gameMode === "ultra") {
-    return {};
-  }
-
-  const processed = state.resolvedEvents.length + state.failedEvents.length;
-  if (processed < state.targetEventCount || state.completedAt) {
-    return {};
+    if (state.failedEvents.length < 20 || state.completedAt) {
+      return {};
+    }
+  } else {
+    const processed = state.resolvedEvents.length + state.failedEvents.length;
+    if (processed < state.targetEventCount || state.completedAt) {
+      return {};
+    }
   }
 
   const durationSeconds = state.startedAt ? Math.max(0, Math.round((now - state.startedAt) / 1000)) : 0;
   const summary: FinalSummary = {
     playerName: state.playerName,
+    gameMode: state.gameMode,
     score: calculateScore({
       resolvedEvents: state.resolvedEvents,
       failedEvents: state.failedEvents,
@@ -338,7 +343,8 @@ export const useGameStore = create<GameState>()(
             message: definition.education.resolvedMessage,
             realWorldContext: definition.education.realWorldContext,
             lawOrPolicy: definition.education.lawOrPolicy,
-            actionHint: definition.education.actionHint
+            actionHint: definition.education.actionHint,
+            sdgInfo: definition.sdgInfo
           },
           ...completeIfNeeded(nextState as GameState, now)
         });
@@ -386,7 +392,8 @@ export const useGameStore = create<GameState>()(
             message: definition.education.resolvedMessage,
             realWorldContext: definition.education.realWorldContext,
             lawOrPolicy: definition.education.lawOrPolicy,
-            actionHint: definition.education.actionHint
+            actionHint: definition.education.actionHint,
+            sdgInfo: definition.sdgInfo
           },
           ...completeIfNeeded(nextState as GameState, now)
         });
@@ -404,6 +411,7 @@ export const useGameStore = create<GameState>()(
         const durationSeconds = Math.max(0, Math.round((now - state.startedAt) / 1000));
         const summary: FinalSummary = {
           playerName: state.playerName,
+          gameMode: state.gameMode,
           score: calculateScore({
             resolvedEvents: state.resolvedEvents,
             failedEvents: state.failedEvents,
