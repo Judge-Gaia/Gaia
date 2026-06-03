@@ -18,6 +18,7 @@ import type {
   FailedEvent,
   FinalSummary,
   GameMode,
+  RunStats,
   ResolvedEvent,
   SkillId
 } from "./types";
@@ -41,6 +42,7 @@ type GameState = {
   resolvedEvents: ResolvedEvent[];
   failedEvents: FailedEvent[];
   achievements: Achievement[];
+  runStats: RunStats;
   lastResolution: ResolutionNotice | null;
   finalSummary: FinalSummary | null;
   startGame: (playerName: string, gameMode?: GameMode) => void;
@@ -99,6 +101,10 @@ function nextAchievements(state: Pick<GameState, "resolvedEvents" | "failedEvent
     add("five_rescues", "연속 회복 작전", "다섯 개 이상의 이벤트를 해결했습니다.");
   }
 
+  if (state.resolvedEvents.length >= 3 && state.failedEvents.length === 0) {
+    add("clean_sweep", "무결점 대응", "초반 세 개 이벤트를 실패 없이 해결했습니다.");
+  }
+
   if (state.resolvedEvents.length + state.failedEvents.length >= TARGET_EVENT_COUNT && state.failedEvents.length === 0) {
     add("perfect_run", "완벽한 가이아", "검정 단계로 실패한 이벤트 없이 라운드를 끝냈습니다.");
   }
@@ -123,18 +129,31 @@ function completeIfNeeded(state: GameState, now: number): Partial<GameState> {
       resolvedEvents: state.resolvedEvents,
       failedEvents: state.failedEvents,
       achievements: state.achievements,
-      durationSeconds
+      durationSeconds,
+      bestCombo: state.runStats.bestCombo
     }),
     durationSeconds,
     resolvedCount: state.resolvedEvents.length,
     failedCount: state.failedEvents.length,
-    achievements: state.achievements
+    achievements: state.achievements,
+    bestCombo: state.runStats.bestCombo,
+    power: state.runStats.power
   };
 
   return {
     completedAt: now,
     activeEvents: [],
     finalSummary: summary
+  };
+}
+
+function runStatsAfterRescue(stats: RunStats): RunStats {
+  const combo = stats.combo + 1;
+  return {
+    combo,
+    bestCombo: Math.max(stats.bestCombo, combo),
+    power: Math.min(100, stats.power + 9 + Math.min(combo, 6) * 2),
+    rescuesWithoutFail: stats.rescuesWithoutFail + 1
   };
 }
 
@@ -150,6 +169,12 @@ export const useGameStore = create<GameState>()(
       resolvedEvents: [],
       failedEvents: [],
       achievements: [],
+      runStats: {
+        combo: 0,
+        bestCombo: 0,
+        power: 70,
+        rescuesWithoutFail: 0
+      },
       lastResolution: null,
       finalSummary: null,
       startGame: (playerName, gameMode = "basic") => {
@@ -164,6 +189,12 @@ export const useGameStore = create<GameState>()(
           resolvedEvents: [],
           failedEvents: [],
           achievements: [],
+          runStats: {
+            combo: 0,
+            bestCombo: 0,
+            power: gameMode === "ultra" ? 82 : 70,
+            rescuesWithoutFail: 0
+          },
           lastResolution: null,
           finalSummary: null
         });
@@ -178,6 +209,12 @@ export const useGameStore = create<GameState>()(
           resolvedEvents: [],
           failedEvents: [],
           achievements: [],
+          runStats: {
+            combo: 0,
+            bestCombo: 0,
+            power: 70,
+            rescuesWithoutFail: 0
+          },
           lastResolution: null,
           finalSummary: null
         });
@@ -208,7 +245,16 @@ export const useGameStore = create<GameState>()(
         const nextState = {
           ...state,
           activeEvents: [...stillActive, ...spawned],
-          failedEvents: [...state.failedEvents, ...failedNow]
+          failedEvents: [...state.failedEvents, ...failedNow],
+          runStats:
+            failedNow.length > 0
+              ? {
+                  ...state.runStats,
+                  combo: 0,
+                  power: Math.max(0, state.runStats.power - failedNow.length * 18),
+                  rescuesWithoutFail: 0
+                }
+              : state.runStats
         };
         const additions = nextAchievements(nextState, now);
         const withAchievements = {
@@ -220,6 +266,7 @@ export const useGameStore = create<GameState>()(
           activeEvents: withAchievements.activeEvents,
           failedEvents: withAchievements.failedEvents,
           achievements: withAchievements.achievements,
+          runStats: withAchievements.runStats,
           ...completeIfNeeded(withAchievements as GameState, now)
         });
       },
@@ -243,10 +290,12 @@ export const useGameStore = create<GameState>()(
         };
         const nextResolved = [...state.resolvedEvents, resolvedEvent];
         const nextActive = state.activeEvents.filter((item) => item.instanceId !== instanceId);
+        const nextRunStats = runStatsAfterRescue(state.runStats);
         const nextPartial = {
           ...state,
           activeEvents: nextActive,
-          resolvedEvents: nextResolved
+          resolvedEvents: nextResolved,
+          runStats: nextRunStats
         };
         const additions = nextAchievements(nextPartial, now);
         const nextAchievementsList = [...state.achievements, ...additions];
@@ -259,6 +308,7 @@ export const useGameStore = create<GameState>()(
           activeEvents: nextActive,
           resolvedEvents: nextResolved,
           achievements: nextAchievementsList,
+          runStats: nextRunStats,
           lastResolution: {
             eventId: definition.id,
             title: definition.title,
@@ -288,10 +338,12 @@ export const useGameStore = create<GameState>()(
         };
         const nextResolved = [...state.resolvedEvents, resolvedEvent];
         const nextActive = state.activeEvents.filter((item) => item.instanceId !== instanceId);
+        const nextRunStats = runStatsAfterRescue(state.runStats);
         const nextPartial = {
           ...state,
           activeEvents: nextActive,
-          resolvedEvents: nextResolved
+          resolvedEvents: nextResolved,
+          runStats: nextRunStats
         };
         const additions = nextAchievements(nextPartial, now);
         const nextAchievementsList = [...state.achievements, ...additions];
@@ -304,6 +356,7 @@ export const useGameStore = create<GameState>()(
           activeEvents: nextActive,
           resolvedEvents: nextResolved,
           achievements: nextAchievementsList,
+          runStats: nextRunStats,
           lastResolution: {
             eventId: definition.id,
             title: definition.title,
@@ -332,12 +385,15 @@ export const useGameStore = create<GameState>()(
             resolvedEvents: state.resolvedEvents,
             failedEvents: state.failedEvents,
             achievements: state.achievements,
-            durationSeconds
+            durationSeconds,
+            bestCombo: state.runStats.bestCombo
           }),
           durationSeconds,
           resolvedCount: state.resolvedEvents.length,
           failedCount: state.failedEvents.length,
-          achievements: state.achievements
+          achievements: state.achievements,
+          bestCombo: state.runStats.bestCombo,
+          power: state.runStats.power
         };
         set({ completedAt: now, activeEvents: [], finalSummary: summary });
         return summary;
@@ -355,6 +411,7 @@ export const useGameStore = create<GameState>()(
         resolvedEvents: state.resolvedEvents,
         failedEvents: state.failedEvents,
         achievements: state.achievements,
+        runStats: state.runStats,
         finalSummary: state.finalSummary
       })
     }

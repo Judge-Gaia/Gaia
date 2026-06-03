@@ -11,21 +11,24 @@ export function calculateScore({
   failedEvents,
   achievements,
   durationSeconds,
+  bestCombo = 0,
   limitSeconds = 360
 }: {
   resolvedEvents: ResolvedEvent[];
   failedEvents: FailedEvent[];
   achievements: Achievement[];
   durationSeconds: number;
+  bestCombo?: number;
   limitSeconds?: number;
 }) {
   const baseScore = resolvedEvents.length * 100;
   const dangerBonus = resolvedEvents.reduce((total, event) => total + statusBonus[event.resolvedStatus], 0);
   const timeBonus = Math.max(0, limitSeconds - durationSeconds) * 2;
   const achievementBonus = achievements.length * 25;
+  const comboBonus = Math.max(0, bestCombo - 1) * 35;
   const failurePenalty = failedEvents.length * 50;
 
-  return Math.max(0, baseScore + dangerBonus + timeBonus + achievementBonus - failurePenalty);
+  return Math.max(0, baseScore + dangerBonus + timeBonus + achievementBonus + comboBonus - failurePenalty);
 }
 
 export function formatDuration(seconds: number) {

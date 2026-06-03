@@ -140,6 +140,14 @@ export default function ResultPage() {
                 <strong>{summary.achievements.length}</strong>
                 <span>업적</span>
               </div>
+              <div className="stat">
+                <strong>{summary.bestCombo ?? 0}</strong>
+                <span>최고 콤보</span>
+              </div>
+              <div className="stat">
+                <strong>{Math.round(summary.power ?? 0)}%</strong>
+                <span>잔여 신의 힘</span>
+              </div>
             </div>
             <button
               className="primary-button"

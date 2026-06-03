@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Clock, Flag, RotateCcw, ShieldCheck } from "lucide-react";
 import { AchievementPanel } from "@/components/achievements/AchievementPanel";
 import { EventMiniGame } from "@/components/event/EventMiniGame";
+import { LiveOpsPanel } from "@/components/game/LiveOpsPanel";
 import { ResolutionModal } from "@/components/game/ResolutionModal";
 import { eventById, TARGET_EVENT_COUNT } from "@/features/game/game-data";
 import { useGameStore } from "@/features/game/game-store";
@@ -31,6 +32,7 @@ export default function GamePage() {
     resolvedEvents,
     failedEvents,
     achievements,
+    runStats,
     completeEvent,
     consumeResolution,
     lastResolution,
@@ -147,6 +149,9 @@ export default function GamePage() {
               <ShieldCheck size={17} aria-hidden="true" />
               해결 {resolvedEvents.length}
             </div>
+            <div className="hud-pill combo-pill">
+              콤보 {runStats.combo} · 힘 {Math.round(runStats.power)}%
+            </div>
             <div className="hud-pill">
               <Clock size={17} aria-hidden="true" />
               {formatDuration(elapsed)}
@@ -172,6 +177,14 @@ export default function GamePage() {
             </button>
           </div>
         </div>
+        <LiveOpsPanel
+          activeEvents={activeEvents}
+          elapsed={elapsed}
+          failedEvents={failedEvents}
+          gameMode={gameMode}
+          resolvedEvents={resolvedEvents}
+          runStats={runStats}
+        />
         <AchievementPanel achievements={achievements} />
       </section>
       {definition && displayEvent && (selectedInstanceId || lastResolution) && (

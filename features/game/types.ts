@@ -61,6 +61,13 @@ export type Achievement = {
   earnedAt: number;
 };
 
+export type RunStats = {
+  combo: number;
+  bestCombo: number;
+  power: number;
+  rescuesWithoutFail: number;
+};
+
 export type FinalSummary = {
   playerName: string;
   score: number;
@@ -68,4 +75,6 @@ export type FinalSummary = {
   resolvedCount: number;
   failedCount: number;
   achievements: Achievement[];
+  bestCombo: number;
+  power: number;
 };

@@ -536,6 +536,110 @@ a {
   z-index: 12;
 }
 
+.combo-pill {
+  border-color: rgba(122, 255, 210, 0.42);
+  color: #dffef5;
+}
+
+.live-ops-panel {
+  display: grid;
+  gap: 10px;
+  left: clamp(16px, 3vw, 34px);
+  position: fixed;
+  top: 96px;
+  width: min(310px, calc(100vw - 32px));
+  z-index: 12;
+}
+
+.live-card {
+  backdrop-filter: blur(22px);
+  background: linear-gradient(180deg, rgba(5, 18, 38, 0.78), rgba(3, 10, 24, 0.7));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 13px;
+}
+
+.live-card-head,
+.combo-strip,
+.live-title {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.live-card-head span,
+.combo-strip span,
+.live-title {
+  gap: 7px;
+}
+
+.live-card-head span,
+.combo-strip span:first-child,
+.live-title {
+  display: inline-flex;
+}
+
+.live-card-head strong {
+  color: #75ffe0;
+}
+
+.power-track {
+  background: rgba(118, 207, 255, 0.14);
+  border-radius: 999px;
+  height: 8px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.power-track i {
+  background: linear-gradient(90deg, var(--green), var(--cyan), #f9d44a);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 260ms ease;
+}
+
+.combo-strip {
+  color: #c8d9e7;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.combo-strip svg {
+  color: var(--orange);
+}
+
+.live-title {
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.ops-log {
+  display: grid;
+  gap: 7px;
+}
+
+.ops-log p {
+  align-items: center;
+  color: #c8d9e7;
+  display: flex;
+  font-size: 12.5px;
+  font-weight: 700;
+  gap: 7px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.ops-log p.urgent {
+  color: #ffd0d0;
+}
+
+.ops-log svg {
+  color: #6ad7ff;
+  flex: 0 0 auto;
+}
+
 .side-panel::before,
 .result-card::before,
 .event-scene::before {
@@ -2433,6 +2537,18 @@ a {
     max-height: none;
   }
 
+  .live-ops-panel {
+    left: 14px;
+    top: 82px;
+    width: min(280px, calc(50vw - 22px));
+  }
+
+  .game-layout > .side-panel {
+    right: 14px;
+    top: 82px;
+    width: min(280px, calc(50vw - 22px));
+  }
+
   .skill-bar {
     grid-template-columns: repeat(2, minmax(0, 140px));
     width: min(360px, calc(100% - 28px));
@@ -2506,6 +2622,11 @@ a {
   .game-layout,
   .event-layout {
     padding-top: 140px;
+  }
+
+  .live-ops-panel,
+  .game-layout > .side-panel {
+    display: none;
   }
 
   .game-event-overlay {
