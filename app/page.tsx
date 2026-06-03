@@ -5,6 +5,7 @@ import { FormEvent, useState, useEffect } from "react";
 import { Play, Trophy, Activity, Cpu, Sparkles } from "lucide-react";
 import { EarthSceneSafe } from "@/components/earth/EarthSceneSafe";
 import { LobbyHeader } from "@/components/LobbyHeader";
+import { SdgIntroModal } from "@/components/SdgIntroModal";
 import { useGameStore } from "@/features/game/game-store";
 import type { GameMode } from "@/features/game/types";
 
@@ -39,6 +40,7 @@ export default function HomePage() {
   const [gameMode, setGameMode] = useState<GameMode>("basic");
   const [rankingTab, setRankingTab] = useState<GameMode>("basic");
   const [rankings, setRankings] = useState<RankingItem[]>([]);
+  const [isIntroOpen, setIsIntroOpen] = useState(false);
 
   // 전역 데이터 테마 설정 초기화 (Cyan 테마 고정)
   useEffect(() => {
@@ -88,11 +90,25 @@ export default function HomePage() {
     router.push("/game");
   };
 
-  // 마운트 시 이전에 설정된 이름 복구
+  // 마운트 시 이전에 설정된 이름 복구 및 첫 진입 SDG 브리핑 팝업 확인
   useEffect(() => {
     const savedName = localStorage.getItem("gaia-user-name");
     if (savedName) setName(savedName);
+
+    const hideDate = localStorage.getItem("gaia-hide-sdg-intro-date");
+    const today = new Date().toLocaleDateString("sv-SE"); // YYYY-MM-DD 포맷
+    if (hideDate !== today) {
+      setIsIntroOpen(true);
+    }
   }, []);
+
+  const handleCloseIntro = (hideToday: boolean) => {
+    if (hideToday) {
+      const today = new Date().toLocaleDateString("sv-SE");
+      localStorage.setItem("gaia-hide-sdg-intro-date", today);
+    }
+    setIsIntroOpen(false);
+  };
 
   return (
     <main className="shell lobby-shell">
@@ -249,6 +265,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <SdgIntroModal isOpen={isIntroOpen} onClose={handleCloseIntro} />
     </main>
   );
 }
