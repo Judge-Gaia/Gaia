@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState, useEffect } from "react";
 import { Play, Trophy, Activity, Cpu, Sparkles } from "lucide-react";
 import { EarthSceneSafe } from "@/components/earth/EarthSceneSafe";
+import { LobbyHeader } from "@/components/LobbyHeader";
 import { useGameStore } from "@/features/game/game-store";
 import type { GameMode } from "@/features/game/types";
 
@@ -100,22 +101,7 @@ export default function HomePage() {
         <EarthSceneSafe events={[]} />
       </div>
 
-      <header className="lobby-topbar">
-        <div className="brand" aria-label="GAIA">
-          <div className="brand-mark pulsing-brand">
-            <Activity size={20} />
-          </div>
-          <div>
-            <div className="brand-title">GAIA</div>
-            <div className="brand-subtitle">생태 위협 통합 관제 본부</div>
-          </div>
-        </div>
-        <div className="lobby-stats">
-          <span className="lobby-stat-pill secondary">
-            시스템 상태: <b>정상 (SECURE)</b>
-          </span>
-        </div>
-      </header>
+      <LobbyHeader />
 
       <section className="lobby-layout">
         <div className="lobby-grid">
