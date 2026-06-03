@@ -37,7 +37,8 @@ export default function GamePage() {
     consumeResolution,
     lastResolution,
     resetGame,
-    tick
+    tick,
+    finishGame
   } = useGameStore();
 
   const selectedActiveEvent = selectedInstanceId
@@ -159,6 +160,7 @@ export default function GamePage() {
             <button
               className="secondary-button"
               onClick={() => {
+                finishGame();
                 router.push("/result");
               }}
             >
