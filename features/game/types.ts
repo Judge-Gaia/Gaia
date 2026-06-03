@@ -1,5 +1,10 @@
 export type SkillId = "rain" | "wind" | "purify" | "grow";
 
+export type Location = {
+  latitude: number;
+  longitude: number;
+};
+
 export type GameMode = "basic" | "ultra";
 
 export type DangerStatus = "yellow" | "orange" | "red" | "black";

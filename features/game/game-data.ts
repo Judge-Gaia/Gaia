@@ -188,3 +188,40 @@ export const eventLocations = [
   { latitude: 35.7, longitude: 139.7 },
   { latitude: 19.4, longitude: -99.1 }
 ];
+
+/** Fisher-Yates 셔플 — 원본 배열을 변경하지 않고 새 배열을 반환합니다. */
+export function shuffle<T>(array: readonly T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+/**
+ * 셔플된 이벤트 ID 시퀀스를 생성합니다.
+ * 6종 이벤트를 반복 셔플해 length 길이의 배열을 만들므로
+ * 같은 이벤트가 연속으로 등장하지 않으며 매 게임 순서가 달라집니다.
+ */
+export function buildEventSequence(length = 200): string[] {
+  const ids = eventDefinitions.map((e) => e.id);
+  const out: string[] = [];
+  while (out.length < length) {
+    out.push(...shuffle(ids));
+  }
+  return out.slice(0, length);
+}
+
+/**
+ * 셔플된 위치 시퀀스를 생성합니다.
+ * 10개 위치를 반복 셔플해 length 길이의 배열을 만들므로
+ * 같은 위치에 이벤트가 연속으로 나타나지 않습니다.
+ */
+export function buildLocationSequence(length = 200): Array<{ latitude: number; longitude: number }> {
+  const out: Array<{ latitude: number; longitude: number }> = [];
+  while (out.length < length) {
+    out.push(...shuffle(eventLocations));
+  }
+  return out.slice(0, length);
+}

@@ -3,9 +3,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
+  buildEventSequence,
+  buildLocationSequence,
   eventById,
-  eventDefinitions,
-  eventLocations,
   MAX_ACTIVE_EVENTS,
   STATUS_TIMINGS,
   TARGET_EVENT_COUNT
@@ -18,6 +18,7 @@ import type {
   FailedEvent,
   FinalSummary,
   GameMode,
+  Location,
   RunStats,
   ResolvedEvent,
   SkillId
@@ -43,6 +44,8 @@ type GameState = {
   failedEvents: FailedEvent[];
   achievements: Achievement[];
   runStats: RunStats;
+  eventSequence: string[];
+  locationSequence: Location[];
   lastResolution: ResolutionNotice | null;
   finalSummary: FinalSummary | null;
   startGame: (playerName: string, gameMode?: GameMode) => void;
@@ -62,13 +65,18 @@ function statusForEvent(event: ActiveEvent, now: number): DangerStatus {
   return "yellow";
 }
 
-function createEvent(index: number, now: number): ActiveEvent {
-  const definition = eventDefinitions[index % eventDefinitions.length];
-  const location = eventLocations[index % eventLocations.length];
+function createEvent(
+  index: number,
+  now: number,
+  eventSeq: string[],
+  locationSeq: Location[]
+): ActiveEvent {
+  const eventId = eventSeq[index % eventSeq.length];
+  const location = locationSeq[index % locationSeq.length];
 
   return {
-    instanceId: `${definition.id}-${now}-${index}`,
-    eventId: definition.id,
+    instanceId: `${eventId}-${now}-${index}`,
+    eventId,
     latitude: location.latitude,
     longitude: location.longitude,
     spawnedAt: now + index * 40,
@@ -175,17 +183,24 @@ export const useGameStore = create<GameState>()(
         power: 70,
         rescuesWithoutFail: 0
       },
+      eventSequence: [],
+      locationSequence: [],
       lastResolution: null,
       finalSummary: null,
       startGame: (playerName, gameMode = "basic") => {
         const now = Date.now();
+        const eventSequence = buildEventSequence();
+        const locationSequence = buildLocationSequence();
         set({
           playerName: playerName.trim(),
           gameMode,
           startedAt: now,
           completedAt: null,
           targetEventCount: TARGET_EVENT_COUNT,
-          activeEvents: Array.from({ length: Math.min(3, TARGET_EVENT_COUNT) }, (_, index) => createEvent(index, now)),
+          activeEvents: Array.from(
+            { length: Math.min(3, TARGET_EVENT_COUNT) },
+            (_, index) => createEvent(index, now, eventSequence, locationSequence)
+          ),
           resolvedEvents: [],
           failedEvents: [],
           achievements: [],
@@ -195,6 +210,8 @@ export const useGameStore = create<GameState>()(
             power: gameMode === "ultra" ? 82 : 70,
             rescuesWithoutFail: 0
           },
+          eventSequence,
+          locationSequence,
           lastResolution: null,
           finalSummary: null
         });
@@ -215,6 +232,8 @@ export const useGameStore = create<GameState>()(
             power: 70,
             rescuesWithoutFail: 0
           },
+          eventSequence: [],
+          locationSequence: [],
           lastResolution: null,
           finalSummary: null
         });
@@ -240,7 +259,11 @@ export const useGameStore = create<GameState>()(
         const slots = Math.max(0, MAX_ACTIVE_EVENTS - stillActive.length);
         const remainingToCreate = state.gameMode === "ultra" ? slots : state.targetEventCount - totalCreated;
         const spawnCount = Math.min(Math.max(0, remainingToCreate), slots);
-        const spawned = Array.from({ length: spawnCount }, (_, index) => createEvent(totalCreated + index, now));
+        const { eventSequence, locationSequence } = state;
+        const spawned = Array.from(
+          { length: spawnCount },
+          (_, index) => createEvent(totalCreated + index, now, eventSequence, locationSequence)
+        );
 
         const nextState = {
           ...state,
@@ -412,6 +435,8 @@ export const useGameStore = create<GameState>()(
         failedEvents: state.failedEvents,
         achievements: state.achievements,
         runStats: state.runStats,
+        eventSequence: state.eventSequence,
+        locationSequence: state.locationSequence,
         finalSummary: state.finalSummary
       })
     }
