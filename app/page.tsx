@@ -21,6 +21,9 @@ type RankingItem = {
 const LOCAL_RANKINGS_KEY_BASIC = "gaia-local-rankings-basic-v1";
 const LOCAL_RANKINGS_KEY_ULTRA = "gaia-local-rankings-ultra-v1";
 
+// Next.js SSR 대응을 위한 LocalStorage 읽기 패턴:
+// 서버 사이드 렌더링 단계에서는 브라우저의 전역 객체인 `window`나 `localStorage`가 존재하지 않습니다.
+// 따라서 typeof window !== "undefined" 조건문이나 마운트(useEffect) 시점에서 안전하게 처리해야 합니다.
 function readLocalRankings(mode: GameMode): RankingItem[] {
   if (typeof window === "undefined") return [];
   const key = mode === "ultra" ? LOCAL_RANKINGS_KEY_ULTRA : LOCAL_RANKINGS_KEY_BASIC;
@@ -49,6 +52,9 @@ export default function HomePage() {
 
   // 랭킹 목록 로드 (선택된 탭 기준 API 페치 후 로컬 폴백)
   useEffect(() => {
+    // cancelled 플래그 패턴: 
+    // 비동기 작업(fetch 등) 도중 컴포넌트가 언마운트되거나 랭킹 탭(rankingTab)이 변경될 경우,
+    // 이전 요청의 결과가 상태(state)에 덮어씌워져 발생하는 레이스 컨디션(Race Condition)을 방지합니다.
     let cancelled = false;
 
     async function loadRankings() {
@@ -58,6 +64,8 @@ export default function HomePage() {
 
         if (cancelled) return;
 
+        // Supabase DB 연동 상태(configured)에 따라 실제 DB 데이터 또는
+        // 로컬 브라우저의 localStorage 랭킹 기록으로 유연하게 스위칭(Fallback)합니다.
         if (result.configured && result.items) {
           setRankings(result.items);
         } else {
@@ -72,6 +80,7 @@ export default function HomePage() {
 
     loadRankings();
 
+    // 클린업 함수에서 cancelled 플래그를 true로 설정
     return () => {
       cancelled = true;
     };
@@ -92,9 +101,14 @@ export default function HomePage() {
 
   // 마운트 시 이전에 설정된 이름 복구 및 첫 진입 SDG 브리핑 팝업 확인
   useEffect(() => {
+    // useEffect 내부는 컴포넌트 마운트 이후에 브라우저 환경에서만 동작하므로,
+    // window 검사 없이 localStorage에 즉시 안전하게 접근 가능합니다.
     const savedName = localStorage.getItem("gaia-user-name");
     if (savedName) setName(savedName);
 
+    // "오늘 하루 동안 보지 않기" (Hide Today) 구현 논리:
+    // sv-SE 로케일의 toLocaleDateString은 항상 'YYYY-MM-DD' 형식의 문자열을 반환합니다.
+    // 로컬 스토리지에 저장된 차단 날짜(hideDate)가 오늘 날짜(today)와 다를 때에만 브리핑 팝업을 표시합니다.
     const hideDate = localStorage.getItem("gaia-hide-sdg-intro-date");
     const today = new Date().toLocaleDateString("sv-SE"); // YYYY-MM-DD 포맷
     if (hideDate !== today) {

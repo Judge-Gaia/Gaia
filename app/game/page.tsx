@@ -46,6 +46,9 @@ export default function GamePage() {
   const [powerNotification, setPowerNotification] = useState<string | null>(null);
   const prevPowerRef = useRef(runStats.power);
 
+  // 신의 권능(Power) 100% 임계점 돌파 감지 및 토스트 UI 알림:
+  // 이전 렌더링 프레임의 권능 수치(prevPowerRef)와 현재 수치를 실시간 비교하여,
+  // 100%에 막 도달한 최초 시점에 일회성 토스트 메시지를 표시하고 4.5초 뒤 비동기(setTimeout)로 자동 소멸시킵니다.
   useEffect(() => {
     const currentPower = Math.round(runStats.power);
     const prevPower = Math.round(prevPowerRef.current);
@@ -136,6 +139,10 @@ export default function GamePage() {
     }
   };
 
+  // 미션 성공 직후의 인터랙티브 지연(Delay) 처리:
+  // 정답 혹은 미션 완료 클릭 즉시 화면을 닫지 않고, isCompletingMission 상태를 활성화합니다.
+  // 이로 인해 UI 배경 레이어가 복구 성공 후의 정화된 실사 이미지(definition.resolvedSceneImage)로 페이드인되며,
+  // 2.8초 동안 복구의 성취감(여운 연출)을 시각적으로 즐길 수 있도록 비동기 딜레이 후 실제 스토어의 completeEvent를 호출합니다.
   const handleMissionComplete = () => {
     if (!selectedInstanceId || !selectedActiveEvent || isCompletingMission) return;
     setSelectedSnapshot({
@@ -160,6 +167,11 @@ export default function GamePage() {
         <div className="earth-stage">
           <EarthSceneSafe
             events={activeEvents}
+            // 영화 같은 화면 연출을 위한 다단계 로딩 트랜지션(Overwatch-style Intro):
+            // 3D 지구의 오염 포인트를 클릭했을 때, 즉시 화면이 전환되면 어색하므로 
+            // 1) 클릭된 대상의 배경 이미지를 로드하여 스크린 전체에 로딩창(`loading`)을 띄우고,
+            // 2) 1.8초 뒤 페이드아웃 애니메이션(`fadeout`)으로 자연스러운 소프트 랜딩을 준비하며,
+            // 3) 2.2초 시점에 최종적으로 미션 전체 인스턴스 뷰를 표시하여 몰입감을 높여 줍니다.
             onSelectEvent={(event) => {
               if (!selectedInstanceId && loadingStep === "none") {
                 const targetDef = eventById.get(event.eventId);

@@ -122,6 +122,10 @@ function nextAchievements(state: Pick<GameState, "resolvedEvents" | "failedEvent
   return additions;
 }
 
+// 게임 종료(Complete) 판단 유틸리티 함수:
+// 1. 무한 모드(ultra): 실패한 이벤트 개수(failedEvents)가 20개 미만이면 계속 진행되고, 20개 이상일 때 비로소 게임 오버(종료) 처리됩니다.
+// 2. 기본 모드(basic): 해결했거나 실패한 이벤트의 합(processed)이 목표 개수(targetEventCount, 10개)에 도달하면 게임이 종료됩니다.
+// 종료 조건 만족 시 최종 스코어, 콤보, 해결 횟수 등을 담은 FinalSummary 객체를 생성하고 상태 변화를 반환합니다.
 function completeIfNeeded(state: GameState, now: number): Partial<GameState> {
   if (state.gameMode === "ultra") {
     if (state.failedEvents.length < 20 || state.completedAt) {
@@ -247,6 +251,9 @@ export const useGameStore = create<GameState>()(
         const state = get();
         if (!state.startedAt || state.completedAt) return;
 
+        // 1. 활성 이벤트 상태 및 만료(실패) 감지:
+        // 각 활성 이벤트의 생존 시간에 따라 위험 단계를 갱신하고, 최고 위험 상태인 'black'에 도달하면
+        // 활성 목록에서 제외하고 failedEvents 목록으로 즉시 이관합니다.
         const failedNow: FailedEvent[] = [];
         const stillActive = state.activeEvents
           .map((event) => ({ ...event, status: statusForEvent(event, now) }))
@@ -258,6 +265,9 @@ export const useGameStore = create<GameState>()(
             return true;
           });
 
+        // 2. 신규 이벤트 동적 생성(Spawn) 계산:
+        // - basic 모드: 누적 생성량(해결 + 실패 + 활성)이 목표 개수를 초과하지 않도록 보장하면서, 최대 동시 노출량(MAX_ACTIVE_EVENTS) 빈 슬롯만큼 추가 스폰합니다.
+        // - ultra 모드: 목표 제한 없이 비어 있는 모든 슬롯을 채우도록 항상 최대 동시 노출량 크기만큼 스폰을 시도합니다.
         const resolvedCount = state.resolvedEvents.length;
         const failedCount = state.failedEvents.length + failedNow.length;
         const totalCreated = resolvedCount + failedCount + stillActive.length;
@@ -270,6 +280,8 @@ export const useGameStore = create<GameState>()(
           (_, index) => createEvent(totalCreated + index, now, eventSequence, locationSequence)
         );
 
+        // 3. 게임 상태 갱신:
+        // 이벤트가 터져서 실패가 발생한 경우 콤보를 0으로 초기화하고, 힘(power) 스탯을 차감합니다.
         const nextState = {
           ...state,
           activeEvents: [...stillActive, ...spawned],
@@ -284,6 +296,8 @@ export const useGameStore = create<GameState>()(
                 }
               : state.runStats
         };
+        
+        // 4. 업적(Achievements) 실시간 트리거 검사:
         const additions = nextAchievements(nextState, now);
         const withAchievements = {
           ...nextState,

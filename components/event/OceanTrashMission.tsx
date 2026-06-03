@@ -73,6 +73,11 @@ export function OceanTrashMission({
     return { x, y };
   };
 
+  // 드래그 종료(Drop) 판정 및 오답 복원 피드백 로직:
+  // 사용자가 아이템을 놓았을 때(pointerUp)의 x, y 좌표가 올바른 수거함 영역(bin)에 위치하는지 판정합니다.
+  // - 정답인 경우: 수거(collected) 상태로 상태를 갱신하고, 전체 정화 완료 여부를 확인합니다.
+  // - 오답(잘못된 수거함) 또는 미스인 경우: rejected 애니메이션을 트리거한 후,
+  //   아이템의 기존 스폰 좌표(homeX, homeY)로 서서히 복원(바운스백) 처리하여 오답 시의 시각적 피드백을 전달합니다.
   const drop = (id: string, x: number, y: number) => {
     const item = items.find((entry) => entry.id === id);
     if (!item || collectedSet.has(id)) return;
@@ -88,7 +93,6 @@ export function OceanTrashMission({
       return;
     }
 
-    // Wrong bin (or dropped over a bin lane) → reject and float back home.
     if (bin) {
       setRejectedId(id);
       window.setTimeout(() => setRejectedId((current) => (current === id ? null : current)), 480);
@@ -151,6 +155,9 @@ export function OceanTrashMission({
             } ${rejectedId === item.id ? "rejected" : ""}`}
             disabled={disabled || isCollected}
             key={item.id}
+            // Pointer Capture API 활용:
+            // 마우스 클릭 또는 터치가 엘리먼트 밖으로 벗어나더라도 포인터 이벤트를 계속해서 수신할 수 있도록
+            // 엘리먼트에 포인터 입력을 고정(Capture)하여 안정적인 드래그 앤 드롭을 구현합니다.
             onPointerDown={(event) => {
               if (disabled || isCollected) return;
               event.currentTarget.setPointerCapture(event.pointerId);
@@ -178,6 +185,9 @@ export function OceanTrashMission({
               setDraggingId(null);
               setHoverBin(null);
             }}
+            // CSS 변수 연동:
+            // 인라인 스타일로 리액트 상태 좌표(item.x, item.y)와 인덱스를 CSS 변수 `--trash-index`로 넘깁니다.
+            // 이렇게 하면 스타일링 코드에서 개별 요소의 애니메이션 딜레이나 배치를 느슨하게 연계 관리할 수 있습니다.
             style={{ "--trash-index": String(index), left: `${item.x}%`, top: `${item.y}%` } as CSSProperties}
             type="button"
           >
