@@ -3855,15 +3855,22 @@ a {
     radial-gradient(circle at 52% 40%, rgba(140, 146, 150, 0.96) 0 28px, transparent 29px),
     radial-gradient(circle at 76% 58%, rgba(104, 112, 116, 0.96) 0 22px, transparent 23px);
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.24));
-  height: 70px;
-  margin-left: -56px;
-  margin-top: -36px;
+  height: 92px;
+  margin-left: -72px;
+  margin-top: -48px;
   opacity: calc(var(--density, 1) * 0.96);
   pointer-events: none;
   position: absolute;
-  transform: scale(calc(0.5 + var(--density, 1) * 0.6));
-  width: 112px;
+  transform: scale(calc(0.58 + var(--density, 1) * 0.62));
+  width: 144px;
   z-index: 5;
+}
+
+.smog-cloud:hover,
+.smog-cloud:focus-visible {
+  filter: drop-shadow(0 0 18px rgba(225, 252, 255, 0.7)) drop-shadow(0 8px 14px rgba(0, 0, 0, 0.24));
+  outline: 2px solid rgba(225, 252, 255, 0.72);
+  outline-offset: 4px;
 }
 
 .air-stacks {

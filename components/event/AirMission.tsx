@@ -1,8 +1,8 @@
 "use client";
 
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
 import type { DangerStatus } from "@/features/game/types";
-import { MissionHud, MissionStage } from "./missionShared";
+import { MissionHud, MissionStage, distance, pointerToPercent } from "./missionShared";
 import { AirBackdrop, FactoryStackArt } from "./missionArt";
 
 type Pollutant = {
@@ -21,6 +21,9 @@ const STACKS = [
   { id: "stack-3", x: 78 }
 ];
 
+const SMOG_HIT_RADIUS = 13;
+const SMOG_DRIFT_SCALE = 0.72;
+
 export function AirMission({
   disabled = false,
   status,
@@ -33,15 +36,15 @@ export function AirMission({
   const stageRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
   const filteredRef = useRef<Set<string>>(new Set());
-  
+
   // Track active pollutants
   const nextIdRef = useRef(5);
   const pollutantsRef = useRef<Pollutant[]>([
-    { id: "pollutant-0", x: 20, y: 35, vx: 7, vy: -6, density: 1, popped: false },
-    { id: "pollutant-1", x: 38, y: 42, vx: -6, vy: 8, density: 1, popped: false },
-    { id: "pollutant-2", x: 54, y: 38, vx: 9, vy: -5, density: 1, popped: false },
-    { id: "pollutant-3", x: 70, y: 45, vx: -8, vy: -7, density: 1, popped: false },
-    { id: "pollutant-4", x: 84, y: 40, vx: 5, vy: 9, density: 1, popped: false }
+    { id: "pollutant-0", x: 20, y: 35, vx: 7 * SMOG_DRIFT_SCALE, vy: -6 * SMOG_DRIFT_SCALE, density: 1, popped: false },
+    { id: "pollutant-1", x: 38, y: 42, vx: -6 * SMOG_DRIFT_SCALE, vy: 8 * SMOG_DRIFT_SCALE, density: 1, popped: false },
+    { id: "pollutant-2", x: 54, y: 38, vx: 9 * SMOG_DRIFT_SCALE, vy: -5 * SMOG_DRIFT_SCALE, density: 1, popped: false },
+    { id: "pollutant-3", x: 70, y: 45, vx: -8 * SMOG_DRIFT_SCALE, vy: -7 * SMOG_DRIFT_SCALE, density: 1, popped: false },
+    { id: "pollutant-4", x: 84, y: 40, vx: 5 * SMOG_DRIFT_SCALE, vy: 9 * SMOG_DRIFT_SCALE, density: 1, popped: false }
   ]);
 
   const [pollutants, setPollutants] = useState<Pollutant[]>(pollutantsRef.current);
@@ -65,7 +68,7 @@ export function AirMission({
           emitAccumulator = 0;
           unfilteredStacks.forEach((stack) => {
             const angle = Math.random() * Math.PI * 2;
-            const speed = 7 + Math.random() * 6;
+            const speed = (7 + Math.random() * 6) * SMOG_DRIFT_SCALE;
             pollutantsRef.current.push({
               id: `pollutant-${nextIdRef.current++}`,
               x: stack.x,
@@ -143,9 +146,30 @@ export function AirMission({
     }
   };
 
+  const handleStagePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (disabled || completedRef.current || !stageRef.current) return;
+
+    const { x, y } = pointerToPercent(event.clientX, event.clientY, stageRef.current);
+
+    if (filteredRef.current.size < STACKS.length) return;
+
+    const target = pollutantsRef.current
+      .filter((pollutant) => !pollutant.popped)
+      .map((pollutant) => ({
+        pollutant,
+        hitDistance: distance(x, y, pollutant.x, pollutant.y)
+      }))
+      .filter(({ hitDistance }) => hitDistance <= SMOG_HIT_RADIUS)
+      .sort((a, b) => a.hitDistance - b.hitDistance)[0]?.pollutant;
+
+    if (target) {
+      popPollutant(target.id);
+    }
+  };
+
   const activeCount = pollutants.filter((p) => !p.popped).length;
   const filterCount = filtered.size;
-  
+
   // Progress calculation
   const totalSteps = STACKS.length + 5; // Chimneys + starting pollutants
   const progress = (filterCount + (5 - Math.min(5, activeCount))) / totalSteps;
@@ -160,6 +184,7 @@ export function AirMission({
       cleared={completedRef.current}
       clearText="대기 회복"
       stageRef={stageRef}
+      onPointerDown={handleStagePointerDown}
     >
       <AirBackdrop className="mission-backdrop" />
 
